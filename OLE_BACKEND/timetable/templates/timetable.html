@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timetable</title>
+    <!-- <link rel="stylesheet"  type="text/css" href="style.css"> -->
+
+    <style>
+        .heading {
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .timetable, td, tr {
+            border-collapse: collapse;
+            margin: auto;
+            max-width: 800px;
+
+            table-layout: fixed ;
+            width: 50% ;
+            border: 1px solid black;
+        }
+
+        .times {
+            width: 4%;
+        }
+
+        .buttons {
+            margin: auto;
+            max-width: 800px;
+        }
+
+        body {
+            background-color: rgba(235, 235, 235, 0.931);
+        }
+
+        
+    </style>
+
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function add_activity() {
+            const data = {"name":"James", "day":"Tuesday", "start_time":4, "end_time":999, "notes":"studies and scales"}
+            fetch("/add_activity", {
+                method:"POST", 
+                headers:{
+                    "Content-Type":"application/json", 
+                    "X-CSRFToken": getCookie('csrftoken'),
+                    "mode": 'same-origin'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(function(response) {
+                console.log("success");
+            }) 
+            .catch(function(error) {
+                console.log(error); 
+            })
+        }
+
+        
+
+        function get_activity(activites, start_time, day) {
+            for (let i = 0; i < activites.length; i++) {
+                if (activities[i].day == day && activities[i].start_time == start_time) {
+                    return activites[i];
+                }
+            }
+            return null;
+        }
+    </script>
+</head>
+
+    
+
+<body>
+    <div class="heading">
+        <h3>Ole Bohn Tutorial Sign-Up Sheet</h3>
+        <h5>Press create to Sign-Up </h5>
+    </div>
+
+
+
+    <div>
+        <table class="timetable">
+            <tr>
+                <th class="times"></th>
+                {% for day in days %}
+                    <th class="days">{{day}}</th>
+                {% endfor %}
+            </tr>
+
+            {%for time in times%}
+            <tr>
+                <th class="times">{{time}}</th>
+                    {% for day in days %}
+
+                        <td>
+                        
+                        {% for activity in activities %}
+                            {% if activity.day == day and activity.start_time == time %}
+                                <a href="/timetable/{{activity.name}}?id={{activity.id}}">{{activity.name}}</a>
+                            {% endif %}
+                        {% endfor %}
+
+                            <a href="/timetable/form/?day={{day}}&start_time={{time}}"> 
+                                <button onclick="display_form({{day}}, {{time}})" type="button" ></button> 
+                            </a>
+
+                        </td>
+                        
+                    {% endfor %}
+
+            </tr>
+            {%endfor%}
+
+        </table>
+        <br>
+        <br>
+      
+    </div>
+
+</body>
+
+</html>
