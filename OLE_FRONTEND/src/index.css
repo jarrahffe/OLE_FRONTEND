@@ -1,7 +1,7 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Roboto;
   line-height: 1.5;
-  font-weight: 400;
+  font-weight: 1000;
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
@@ -12,6 +12,18 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+}
+
+@media screen and (max-width: 600px) {
+  body {
+    font-size: 0.6rem;
+  } 
+}
+
+@media screen and (min-width: 601px) {
+  body {
+    font-size: 1rem;
+  } 
 }
 
 a {
@@ -27,9 +39,10 @@ body {
   margin: 0;
   display: flex;
   place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  /* min-width: 320px;
+  min-height: 100vh; */
 }
+
 
 h1 {
   font-size: 3.2em;

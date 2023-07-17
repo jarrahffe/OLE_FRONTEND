@@ -1,17 +1,25 @@
 {
   "name": "ole-frontend",
-  "private": true,
+  "private": false,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "host": "sh run_lan.sh"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@fontsource/roboto": "^5.0.3",
+    "@mui/icons-material": "^5.13.7",
+    "@mui/material": "^5.13.7",
     "@react-spring/web": "^9.7.2",
     "@tippyjs/react": "^4.2.6",
+    "axios": "^1.4.0",
     "formik": "^2.2.9",
+    "material-ui-popup-state": "^5.0.9",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-table": "^7.8.0",

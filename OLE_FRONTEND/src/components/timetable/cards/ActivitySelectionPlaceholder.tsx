@@ -1,4 +1,5 @@
 import React from 'react'
+import { ClickContext } from '../../../contexts';
 import { animated, useSpring } from '@react-spring/web';
 
 type Props = {
@@ -6,43 +7,49 @@ type Props = {
 }
 
 const ActivitySelectionPlaceholder = (props: Props) => {
+
+  // clicked = Grid cell currently clicked variable (string)
+  // setClicked = Function to set currently clicked grid cell
+  const { clicked, setClicked } = React.useContext(ClickContext);
+
   const [springs, api] = useSpring(() => ({
     from: {
-      backgroundImage: "linear-gradient(90deg, #FFFFFF -77.97%, #C1C1C1 258.37%)",
-      width: "0%",
+      backgroundColor: "#eceff1",
+      opacity: "0%"
     }
   }));
 
   React.useEffect(() => {
     api.start({
       from: {
-        width: "0%",
-        backgroundImage: "linear-gradient(90deg, #000000 -77.97%, #646464 258.37%)"
+        opacity: "0%"
       },
       to: {
-        width: "95%",
-        backgroundImage: "linear-gradient(90deg, #FFFFFF -77.97%, #C1C1C1 258.37%)",
+        opacity: "100%"
       }
     });
   }, [])
 
   return (
+
     <animated.div
+      onClick={() => setClicked("")}
       style={{
         position: "absolute",
-        height: "80%",
+        height: "100%",
+        width: "100%",
         outline: "grey solid 0.5px",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        color: "black",
-        borderRadius: "20px",
+        color: "rgb(37,52,69)",
         ...springs
       }}>
 
       <div className='grid-cell-name'>
         <p>{props.name}</p>
       </div>
+
     </animated.div>
   )
 }

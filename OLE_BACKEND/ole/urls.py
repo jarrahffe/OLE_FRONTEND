@@ -15,18 +15,21 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from timetable.api import views
+from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    path('timetable/', views.display_timetable),
+    path('timetable/', include('timetable.urls')),
+
+    path('users/', include('users.urls')),
+    path('get-token/', obtain_auth_token),
 
 
-    #REST FRAMEWORK URLS
-    #DJANGO API
-    path('get_activity/', views.get_activity),
-    path('add_activity/', views.add_activity),
-    path('delete_activity/', views.delete_activity),
+    
+    
+
+
+    
 
 ]

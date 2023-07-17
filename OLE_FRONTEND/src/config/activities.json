@@ -2,53 +2,53 @@
   "activities": [
     {
       "id": "1monday13",
-      "ownerId": "xuray",
       "type": "lesson",
       "name": "Ray",
       "day": "monday",
-      "startTime": 13,
-      "endTime": 14,
-      "notes": "weekly lesson"
+      "start_time": 13,
+      "end_time": 14,
+      "notes": "weekly lesson",
+      "user": 1
     },
     {
       "id": "1thursday10",
-      "ownerId": "ole",
       "type": "block",
       "name": "Ole",
       "day": "thursday",
-      "startTime": 10,
-      "endTime": 11,
-      "notes": "ceebs teaching fuckin kids"
+      "start_time": 10,
+      "end_time": 11,
+      "notes": "ceebs teaching fuckin kids",
+      "user": 1
     },
     {
       "id": "1wednesday18",
-      "ownerId": "ole",
       "type": "special",
       "name": "Studio",
       "day": "wednesday",
-      "startTime": 18,
-      "endTime": 19,
-      "notes": "performance"
+      "start_time": 18,
+      "end_time": 19,
+      "notes": "performance",
+      "user": 1
     },
     {
       "id": "1wednesday19",
-      "ownerId": "ole",
       "type": "special",
       "name": "Studio",
       "day": "wednesday",
-      "startTime": 19,
-      "endTime": 20,
-      "notes": "performance"
+      "start_time": 19,
+      "end_time": 20,
+      "notes": "performance",
+      "user": 1
     },
     {
       "id": "1wednesday8",
-      "ownerId": "ryan",
       "type": "lesson",
       "name": "Ryan",
       "day": "wednesday",
-      "startTime": 8,
-      "endTime": 9,
-      "notes": "performance"
+      "start_time": 8,
+      "end_time": 9,
+      "notes": "performance",
+      "user": 1
     }
   ]
 }

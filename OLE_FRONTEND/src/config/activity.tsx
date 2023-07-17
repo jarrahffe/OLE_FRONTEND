@@ -1,24 +1,22 @@
 export type Activity = {
   id: string
-  ownerId: string
   type: string
   name: string
   day: string
-  startTime: number
-  endTime: number
+  start_time: number
   notes: string
+  user: number
 }
 
-export const makeActivity = (id: string, ownerId: string, type: string, name: string, day: string, startTime: number, endTime: number, notes: string): Activity => {
+export const makeActivity = (id: string, type: string, name: string, day: string, startTime: number, notes: string, user: number): Activity => {
   const ret: Activity = {
     id: id,
-    ownerId: ownerId,
     type: type,
     name: name,
     day: day,
-    startTime: startTime,
-    endTime: endTime,
-    notes: notes
+    start_time: startTime,
+    notes: notes,
+    user: user,
   }
 
   return ret;
