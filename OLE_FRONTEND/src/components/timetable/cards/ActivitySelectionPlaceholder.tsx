@@ -1,5 +1,5 @@
 import React from 'react'
-import { ClickContext } from '../../../Contexts';
+import { ClickContext } from '../../../contexts';
 import { animated, useSpring } from '@react-spring/web';
 
 type Props = {

@@ -2,7 +2,7 @@ import React from 'react';
 import DayCard from './cards/DayCard';
 import TimeGrid from './Grid';
 import TimeCard from './cards/TimeCard';
-import { TimeCardContext, DayCardContext } from '../../Contexts';
+import { TimeCardContext, DayCardContext } from '../../contexts';
 
 const timetable = () => {
   const days = ["Mon", "Tues", "Wed", "Thurs", "Fri"];

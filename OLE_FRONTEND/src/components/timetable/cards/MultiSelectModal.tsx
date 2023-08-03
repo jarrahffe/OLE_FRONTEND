@@ -3,7 +3,7 @@ import React from 'react'
 import moment from 'moment'
 import { Activity } from '../../../config/activity'
 import { RequestActivity, blockRequest, bookRequest } from '../../../helpers/RequestHelpers'
-import { MultiSelectContext } from '../../../Contexts'
+import { MultiSelectContext } from '../../../contexts'
 
 type Props = {
   setModal: React.Dispatch<React.SetStateAction<boolean>>

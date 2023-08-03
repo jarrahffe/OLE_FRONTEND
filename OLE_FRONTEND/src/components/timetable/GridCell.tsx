@@ -3,7 +3,7 @@ import { Activity, makeActivity } from '../../config/activity';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import ActivitySelection from './cards/ActivitySelection';
-import { ClickContext, TimeCardContext, DayCardContext, WeekContext, MultiSelectContext, DateMapContext } from '../../Contexts';
+import { ClickContext, TimeCardContext, DayCardContext, WeekContext, MultiSelectContext, DateMapContext } from '../../contexts';
 import ActivitySelectionPlaceholder from './cards/ActivitySelectionPlaceholder';
 import { animated, useSpring, useTransition } from '@react-spring/web';
 import { Box } from '@mui/material';

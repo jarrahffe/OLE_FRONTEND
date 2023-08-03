@@ -1,7 +1,7 @@
 import React from 'react';
 import { Activity } from '../../config/activity';
 import GridCell from './GridCell';
-import { ClickContext, DateMapContext, DayCardContext, MultiSelectContext, TimeCardContext, WeekContext } from '../../Contexts';
+import { ClickContext, DateMapContext, DayCardContext, MultiSelectContext, TimeCardContext, WeekContext } from '../../contexts';
 import MultiSelectModal from './cards/MultiSelectModal';
 import { animated, useTransition } from '@react-spring/web';
 

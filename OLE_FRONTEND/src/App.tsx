@@ -10,7 +10,7 @@ import axios from 'axios';
 import Theme from './Theme';
 import { CircularProgress } from '@mui/material';
 import moment from 'moment';
-import { DateMapContext, MultiSelectContext, WeekContext } from './Contexts';
+import { DateMapContext, MultiSelectContext, WeekContext } from './contexts';
 import { mapDaysToDate } from './helpers/DateHelpers';
 import { Activity } from './config/activity';
 

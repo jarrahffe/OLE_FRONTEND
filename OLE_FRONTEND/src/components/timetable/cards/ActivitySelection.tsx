@@ -1,6 +1,6 @@
 import React from 'react'
 import axios from 'axios';
-import { ClickContext, DateMapContext, WeekContext } from '../../../Contexts';
+import { ClickContext, DateMapContext, WeekContext } from '../../../contexts';
 import { TextField, Button, CircularProgress } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import CloseIcon from '@mui/icons-material/Close'

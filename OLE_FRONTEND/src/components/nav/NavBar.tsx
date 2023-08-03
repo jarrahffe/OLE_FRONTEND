@@ -2,7 +2,7 @@ import { Box } from '@mui/system';
 import { Typography, Button, Slider, Switch, FormControlLabel, Alert } from '@mui/material';
 import React from 'react';
 import moment from 'moment';
-import { DateMapContext, MultiSelectContext, WeekContext } from '../../Contexts';
+import { DateMapContext, MultiSelectContext, WeekContext } from '../../contexts';
 import { mapDaysToDate } from '../../helpers/DateHelpers';
 import { animated, useSpring } from '@react-spring/web';
 import DeleteIcon from '@mui/icons-material/Delete';
