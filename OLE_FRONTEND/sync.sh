@@ -2,7 +2,7 @@
 
 cp -r ../* ../../music-scheduler/
 
-cd ../../music-scheduler/
-git add -A
-git commit -m "latest update"
-git push
+# cd ../../music-scheduler/
+# git add -A
+# git commit -m "latest update"
+# git push
