@@ -1,4 +1,5 @@
 import React from 'react'
+import { Activity } from './config/activity'
 
 type ClickContext = {
   clicked: string
@@ -17,9 +18,29 @@ type DayCardContext = {
 
 type DateMapContext = {
   dateMap: Map<string, string>
+  setDateMap: React.Dispatch<React.SetStateAction<Map<string, string>>>
+}
+
+type WeekContext = {
+  selectedWeek: number
+  setSelectedWeek: React.Dispatch<React.SetStateAction<number>>
+}
+
+
+type MultiSelectContext = {
+  blockSelect: boolean
+  setBlockSelect: React.Dispatch<React.SetStateAction<boolean>>
+  eventSelect: boolean
+  setEventSelect: React.Dispatch<React.SetStateAction<boolean>>
+  multiActivities: Map<Activity, Function> | undefined
+  setMultiActivities: React.Dispatch<React.SetStateAction<Map<Activity, Function> | undefined>>
+  multiSelectModal: boolean
+  setMultiSelectModal: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export const ClickContext = React.createContext({} as ClickContext);
 export const TimeCardContext = React.createContext({} as TimeCardContext);
 export const DayCardContext = React.createContext({} as DayCardContext);
 export const DateMapContext = React.createContext({} as DateMapContext);
+export const WeekContext = React.createContext({} as WeekContext);
+export const MultiSelectContext = React.createContext({} as MultiSelectContext)

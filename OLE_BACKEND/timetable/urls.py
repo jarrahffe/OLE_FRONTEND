@@ -12,4 +12,8 @@ urlpatterns = [
     path('add_activity', views.add_activity),
     path('delete_activity', views.delete_activity),
     path('block_times', views.block_times),
+
+    path('create_swap_request', views.create_swap_request),
+    path('accept_swap_request', views.accept_swap_request)
+    
 ]

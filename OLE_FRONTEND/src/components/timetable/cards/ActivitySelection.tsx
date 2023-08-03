@@ -1,11 +1,12 @@
 import React from 'react'
 import axios from 'axios';
-import { ClickContext, DateMapContext } from '../../../contexts';
-import { animated, useSpring } from '@react-spring/web';
+import { ClickContext, DateMapContext, WeekContext } from '../../../Contexts';
 import { TextField, Button, CircularProgress } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import CloseIcon from '@mui/icons-material/Close'
 import { Activity, makeActivity } from '../../../config/activity';
-import { useTheme } from '@emotion/react';
+import moment from 'moment';
+import { RequestActivity, bookRequest } from '../../../helpers/RequestHelpers';
 
 type Props = {
   day: string
@@ -17,71 +18,40 @@ const ActivitySelection = (props: Props) => {
 
   const { setClicked } = React.useContext(ClickContext);
   const { dateMap } = React.useContext(DateMapContext);
+  const { selectedWeek } = React.useContext(WeekContext);
 
   const [notes, setNotes] = React.useState("");
-  const [type, setType] = React.useState("lesson");
+  const [type, setType] = React.useState("block");
   const [bookProgress, setBookProgress] = React.useState(false);
 
-  const currentIsoDate = dateMap.get(props.day.slice(0, 3).toLocaleLowerCase())?.split("-");
-  const monthNum = (new Date().getMonth() + 1).toString()
-  const monthWord = Intl.DateTimeFormat('en', { month: 'long' }).format(new Date(monthNum));
-  const dayNum = currentIsoDate?.at(2)?.charAt(1);
-
-  const theme = useTheme();
-
-  const [springs, api] = useSpring(() => ({
-    from: {
-      backgroundColor: "#eceff1",
-      height: "0%",
-      opacity: "0%"
-    }
-  }));
-
-  // Animate -> on render
-  React.useEffect(() => {
-    api.start({
-      from: {
-        height: "0%",
-        backgroundColor: "#eceff1",
-        opacity: "0%"
-      },
-      to: {
-        height: "300%",
-        backgroundColor: "#eceff1",
-        opacity: "100%"
-      }
-    });
-  }, []);
+  const currentIsoDate = dateMap.get(props.day.slice(0, 3).toLocaleLowerCase()) as string;
+  const momentDate = moment(currentIsoDate, "YYYY-MM-DD");
+  const monthWord = momentDate.format("MMM");
+  const dayNum = momentDate.format("D");
 
   // * API call -> /add_activity *
   async function handleBook() {
-    props.setActivity(makeActivity(`${props.day}:${props.time}`, type, "xu ray", props.day, props.time, notes, Math.random()));
     setBookProgress(true);
-    await sleep(500);
-    axios.post(`${import.meta.env.VITE_BE_API_ADD_ACTIVITY}`, {
-      "type": type,
-      "name": "xu ray",
-      "day": props.day,
-      "start_time": props.time,
-      "notes": notes,
-      "date": currentIsoDate?.join("-")
-    },
-      {
-        headers: {
-          "Authorization": "Token e765ab6923106944459e1752a716c34cb10e84c9"
-        }
-      }).then(function(response) {
-        console.log(response)
-        if (response.status === 200) {
-          setBookProgress(false);
-          props.setActivity(makeActivity(`${props.day}:{props.time}`, type, "xu ray", props.day, props.time, notes, Math.random()));
-        }
-      })
+
+    const bookObj: RequestActivity = {
+      name: "xu ray",
+      type: type,
+      day: props.day,
+      date: currentIsoDate,
+      start_time: props.time,
+      week: selectedWeek,
+      notes: notes
+    }
+
+    const status: Array<number> = [];
+    bookRequest(bookObj, status);
+    await sleep(800);
+
+    setBookProgress(false);
   }
 
   return (
-    <animated.div className="activity-selection" style={{ ...springs }}>
-
+    <>
       <h4 className="activity-selection-header">
         {props.day.charAt(0).toUpperCase() + props.day.slice(1)}, {monthWord} {dayNum} {":"} {props.time > 12 ? props.time % 12 : props.time}
         {props.time > 11 ? "pm" : "am"}
@@ -110,20 +80,20 @@ const ActivitySelection = (props: Props) => {
       </div>
 
       <div className='activity-selection-book-button'>
-        {
-          bookProgress ? <CircularProgress size={25} /> :
-            <Button
+        {/* {
+          bookProgress ? <CircularProgress size={25} /> : */}
+            <LoadingButton
+              loading={bookProgress}
               variant='contained'
               size='small'
               onClick={() => handleBook()}
               disableElevation
             >
               Book
-            </Button>
-        }
+            </LoadingButton>
+        {/* } */}
       </div>
-
-    </animated.div>
+    </>
   )
 }
 

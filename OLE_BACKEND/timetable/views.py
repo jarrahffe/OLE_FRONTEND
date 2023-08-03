@@ -10,8 +10,9 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.core.mail import send_mail
 from django.conf import settings
 
-from timetable.models import Activity
-from .serializers import ActivitySerializer
+from timetable.models import Activity, Swap_request
+from .serializers import ActivitySerializer, SwapRequestSerializer
+
 from django.contrib.auth.models import User
 from django.db import models
 import datetime
@@ -106,9 +107,9 @@ def delete_activity(request):
 
 
 # {"activities": [
-#   {"type": "block", "date": "2017-06-1", "day":  "monday", "start_time": 9}, 
-#   {"type": "block", "date": "2017-06-1", "day":  "monday", "start_time": 10},
-#   {"type": "block", "date": "2017-06-1", "day":  "monday", "start_time": 11}
+#   {"type": "block", "week": 3, "date": "2023-08-31", "day":  "monday", "start_time": 9}, 
+#   {"type": "block", "week": 3, "date": "2023-08-31", "day":  "monday", "start_time": 10},
+#   {"type": "block", "week": 3, "date": "2023-08-31", "day":  "monday", "start_time": 11}
 # ]}
 @api_view(['POST']) 
 @permission_classes([AllowAny])
@@ -130,3 +131,84 @@ def block_times(request):
         print()
 
     return Response(200)
+
+
+@api_view(['POST']) 
+@permission_classes([IsAuthenticated])
+def create_swap_request(request):
+    data = request.data
+
+    activity_1 = Activity.objects.get(pk=data['activity_1'])
+    activity_2 = Activity.objects.get(pk=data['activity_2'])
+    print(activity_1.name, activity_2.name)
+    
+    if activity_1.user != request.user:
+        return Response({"response": "you don't have permission to request this swap"})
+
+
+
+    swap_request = Swap_request(activity_1=activity_1, activity_2=activity_2)
+    serializer = SwapRequestSerializer(swap_request, data)
+    print(serializer)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def accept_swap_request(request):
+    swap_request = Swap_request.objects.get(pk=request.data['id'])  
+    activity_1 = swap_request.activity_1
+    activity_2 = swap_request.activity_2
+
+    if activity_2.user != request.user:
+        return Response({"response": "you don't have permission to accept this swap"})
+
+    #swap dates
+    temp_date = activity_1.date
+    activity_1.date = activity_2.date
+    activity_2.date = temp_date
+
+    #swap times
+    temp_time = activity_1.start_time
+    activity_1.start_time = activity_2.start_time
+    activity_2.start_time = temp_time
+
+    #swap day
+    temp_day = activity_1.day
+    activity_1.day = activity_2.day
+    activity_2.day = temp_day
+
+    activity_1.save()
+    activity_2.save()
+
+    swap_request.delete()
+
+    return Response({"response": "successfully swapped {} <-> {}".format(activity_1, activity_2)})
+
+
+
+# @api_view(['GET']) 
+# @permission_classes([IsAuthenticated])
+# def accept_swap_request(request):
+#     swap_request = Swap_request.objects.get(id=request.data['id'])
+#     swap_request.approved += 1
+#     swap_request.save()
+
+#     #perform swap
+#     if swap_request.approved == len(swap_request.changes):
+        
+#         changes_dic = swap_request.changes
+#         for k, v in changes_dic.items():
+#             activity = Activity.objects.get(pk=int(k))
+#             print(activity.name, k, v)
+
+#             activity.start_time = int(v['start_time'])
+#             activity.date = v['date']
+#             activity.day = v['day']
+#             activity.save()
+    
+#     serializer = SwapRequestSerializer(swap_request)
+#     return Response(serializer.data)

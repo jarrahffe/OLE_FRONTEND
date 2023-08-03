@@ -1,8 +1,8 @@
 import React from 'react';
-import { DateMapContext } from '../../../contexts';
+import { DateMapContext } from '../../../Contexts';
 import { Typography } from '@mui/material';
 import { useSpring, animated } from '@react-spring/web';
-import { DayCardContext } from '../../../contexts';
+import { DayCardContext } from '../../../Contexts';
 
 type Props = {
   day: string

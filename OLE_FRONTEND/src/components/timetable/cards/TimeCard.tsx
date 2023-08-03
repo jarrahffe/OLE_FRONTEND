@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, Typography } from '@mui/material'
-import { TimeCardContext } from '../../../contexts'
+import { TimeCardContext } from '../../../Contexts'
 import { useSpring, animated } from '@react-spring/web'
 
 type Props = {

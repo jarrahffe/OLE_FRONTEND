@@ -1,5 +1,5 @@
 import React from 'react'
-import { ClickContext } from '../../../contexts';
+import { ClickContext } from '../../../Contexts';
 import { animated, useSpring } from '@react-spring/web';
 
 type Props = {
@@ -43,6 +43,7 @@ const ActivitySelectionPlaceholder = (props: Props) => {
         justifyContent: "center",
         alignItems: "center",
         color: "rgb(37,52,69)",
+        zIndex: 4,
         ...springs
       }}>
 

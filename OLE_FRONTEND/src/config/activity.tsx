@@ -5,10 +5,11 @@ export type Activity = {
   day: string
   start_time: number
   notes: string
-  user: number
+  week: number
+  date: string
 }
 
-export const makeActivity = (id: string, type: string, name: string, day: string, startTime: number, notes: string, user: number): Activity => {
+export const makeActivity = (id: string, type: string, name: string, day: string, startTime: number, notes: string, week: number, date: string): Activity => {
   const ret: Activity = {
     id: id,
     type: type,
@@ -16,9 +17,9 @@ export const makeActivity = (id: string, type: string, name: string, day: string
     day: day,
     start_time: startTime,
     notes: notes,
-    user: user,
+    week: week,
+    date: date
   }
-
   return ret;
 }
 
