@@ -86,7 +86,7 @@ const GridCell = (props: Props) => {
 
       else if (!activity) {
         const newActivity =  blockSelect ? makeActivity(props.id, "block", "block", props.day, props.time, "", selectedWeek, dateMap.get(props.day.slice(0,3)) as string)
-        : makeActivity(props.id, "special", "event", props.day, props.time, "", selectedWeek, dateMap.get(props.day.slice(0,3)) as string);
+        : makeActivity(props.id, "special", "", props.day, props.time, "", selectedWeek, dateMap.get(props.day.slice(0,3)) as string);
 
         setActivity(newActivity);
         if (multiActivities) setMultiActivities(multiActivities.set(newActivity, setActivity))
@@ -112,7 +112,7 @@ const GridCell = (props: Props) => {
 
   return activity ?
     (
-      <Tippy content={<p>{activity.notes}</p>} disabled={activity.notes === ""}>
+      <Tippy content={<p>{activity.id}</p>} >
         <animated.div className="grid-cell-blank"
         style={springs}
         id={activity.id}

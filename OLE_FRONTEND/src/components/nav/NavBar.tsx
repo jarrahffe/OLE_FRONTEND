@@ -101,7 +101,7 @@ const NavBar = () => {
         </Box>
 
         <Box sx={{ display: "flex", flexDirection: "column",  alignItems: "center"}}>
-          <Typography sx={{fontSize: "0.8rem"}}>Studio</Typography>
+          <Typography sx={{fontSize: "0.8rem"}}>Event</Typography>
           <Switch disabled={blockSelect && multiActivities !== undefined} color='primary' checked={eventSelect} onChange={() => handleEventCheck()} name="multiselect" />
         </Box>
       </Box>

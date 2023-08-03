@@ -121,6 +121,7 @@ def block_times(request):
         return Response({"Response": "You don't have permission to block time slots"})
     
     data = request.data
+    response = []
     for object in data['activities']:
         activity = Activity(user=user, name="unavailable", notes="unavailable")
 
@@ -128,9 +129,10 @@ def block_times(request):
         serializer = ActivitySerializer(activity, object)
         if serializer.is_valid():
             serializer.save()
+            response.append(serializer.data)
         print()
 
-    return Response(200)
+    return Response(response)
 
 
 @api_view(['POST']) 

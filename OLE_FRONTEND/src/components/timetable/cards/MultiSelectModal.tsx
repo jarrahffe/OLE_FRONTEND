@@ -2,7 +2,7 @@ import { Box, Button, Input, Paper, TextField, Typography } from '@mui/material'
 import React from 'react'
 import moment from 'moment'
 import { Activity } from '../../../config/activity'
-import { RequestActivity, bookRequest } from '../../../helpers/RequestHelpers'
+import { RequestActivity, blockRequest, bookRequest } from '../../../helpers/RequestHelpers'
 import { MultiSelectContext } from '../../../Contexts'
 
 type Props = {
@@ -13,16 +13,32 @@ type Props = {
 
 const MultiSelectModal = (props: Props) => {
 
-  const { eventSelect } = React.useContext(MultiSelectContext);
-  const [eventName, setEventName] = React.useState("");
+  const { eventSelect, blockSelect } = React.useContext(MultiSelectContext);
+  const [eventName, setEventName] = React.useState("Studio");
 
   async function handleConfirm() {
-    for (const activity of (props.multiActivities as Map<Activity, Function>).keys()) {
-      const reqActivity: RequestActivity = activity;
-      delete reqActivity.id;
+    if (eventSelect) {
+      for (const activity of (props.multiActivities as Map<Activity, Function>).keys()) {
+        const reqActivity: RequestActivity = activity;
+        reqActivity.name = eventName;
+        delete reqActivity.id;
+        const status: Array<number> = [];
+        await bookRequest(reqActivity, status);
+      }
+    }
+    else {
+      const blockActivities: RequestActivity[] = [];
       const status: Array<number> = [];
-      console.log(reqActivity);
-      await bookRequest(reqActivity, status);
+
+      for (const activity of (props.multiActivities as Map<Activity, Function>).keys()) {
+        const reqActivity: RequestActivity = activity;
+        delete reqActivity.id;
+        delete reqActivity.name;
+        delete reqActivity.notes;
+        blockActivities.push(reqActivity);
+      }
+      await blockRequest({activities: blockActivities}, status);
+
     }
     props.setModal(false);
     props.setMultiActivities(undefined);
