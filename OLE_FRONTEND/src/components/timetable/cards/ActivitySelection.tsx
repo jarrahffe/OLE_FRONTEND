@@ -1,6 +1,6 @@
 import React from 'react'
 import axios from 'axios';
-import { ClickContext, DateMapContext, WeekContext } from '../../../contexts';
+import { ClickContext, DateMapContext, UserInfoContext, WeekContext } from '../../../contexts';
 import { TextField, Button, CircularProgress } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import CloseIcon from '@mui/icons-material/Close'
@@ -11,6 +11,8 @@ import { RequestActivity, bookRequest } from '../../../helpers/RequestHelpers';
 type Props = {
   day: string
   time: number
+  name: string
+  setName: React.Dispatch<React.SetStateAction<string>>
   setActivity: React.Dispatch<React.SetStateAction<Activity | undefined>>
 }
 
@@ -19,10 +21,12 @@ const ActivitySelection = (props: Props) => {
   const { setClicked } = React.useContext(ClickContext);
   const { dateMap } = React.useContext(DateMapContext);
   const { selectedWeek } = React.useContext(WeekContext);
-
-  const [notes, setNotes] = React.useState("");
-  const [type, setType] = React.useState("block");
+  const { token } = React.useContext(UserInfoContext)
+  const [type, setType] = React.useState("lesson");
   const [bookProgress, setBookProgress] = React.useState(false);
+
+  // The actual name retrieved? from window cookies
+  const { firstName } = React.useContext(UserInfoContext);
 
   const currentIsoDate = dateMap.get(props.day.slice(0, 3).toLocaleLowerCase()) as string;
   const momentDate = moment(currentIsoDate, "YYYY-MM-DD");
@@ -34,21 +38,21 @@ const ActivitySelection = (props: Props) => {
     setBookProgress(true);
 
     const bookObj: RequestActivity = {
-      name: "xu ray",
+      name: props.name,
       type: type,
       day: props.day,
       date: currentIsoDate,
       start_time: props.time,
       week: selectedWeek,
-      notes: notes
     }
 
     const status: Array<number> = [];
-    bookRequest(bookObj, status);
-    await sleep(800);
-
-    setBookProgress(false);
+    bookRequest(bookObj, status, token, setBookProgress, setClicked);
   }
+
+  React.useEffect(() => {
+    return () => props.setName(firstName)
+  }, [])
 
   return (
     <>
@@ -71,27 +75,25 @@ const ActivitySelection = (props: Props) => {
           maxRows={1}
           size="small"
           id="outlined-controlled"
-          label="Notes"
-          value={notes}
+          label="Name"
+          value={props.name}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setNotes(event.target.value);
+            props.setName(event.target.value);
           }}
         />
       </div>
 
       <div className='activity-selection-book-button'>
-        {/* {
-          bookProgress ? <CircularProgress size={25} /> : */}
             <LoadingButton
               loading={bookProgress}
               variant='contained'
+              color='secondary'
               size='small'
               onClick={() => handleBook()}
               disableElevation
             >
               Book
             </LoadingButton>
-        {/* } */}
       </div>
     </>
   )

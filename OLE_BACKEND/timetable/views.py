@@ -10,12 +10,14 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.core.mail import send_mail
 from django.conf import settings
 
-from timetable.models import Activity, Swap_request
+from django.contrib.auth import get_user_model
+from timetable.models import Activity, Swap_request, Event
 from .serializers import ActivitySerializer, SwapRequestSerializer
 
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from django.db import models
 import datetime
+
 
 
 
@@ -45,6 +47,33 @@ def get_activity(request):
     serialised = ActivitySerializer(activity)
     return Response(serialised.data)
 
+### ADD Event ###
+# {"activities": [
+#   {"type": "event", "week": 3, "date": "2023-08-31", "day":  "monday", "start_time": 9}, 
+#   {"type": "event", "week": 3, "date": "2023-08-31", "day":  "monday", "start_time": 10},
+#   {"type": "event", "week": 3, "date": "2023-08-31", "day":  "monday", "start_time": 11}
+# ]}
+@api_view(['POST']) 
+@permission_classes([IsAuthenticated])
+def add_event(request):
+    data = request.data
+
+    account = request.data
+    event = Event(account=account, name=data['name'])
+
+    for object in data['activities']:
+        activity = Activity(account=account, name=data['name'], event=event)
+
+        #save new Activity object to database
+        serializer = ActivitySerializer(activity, object)
+        if serializer.is_valid():
+            serializer.save()
+
+    return Response(serializer.data) 
+
+def add_note_to_event(request):
+    pass
+
 
 ### ADD Activity ###
 @api_view(['POST']) 
@@ -52,10 +81,10 @@ def get_activity(request):
 def add_activity(request):
 
     data = request.data
-    
+
     #add User to new activity object
-    user = request.user
-    new_activity = Activity(user=user, date=data['date'])
+    account = request.user
+    new_activity = Activity(account=account, date=data['date'])
 
     #check if time is available
     activities = Activity.objects.filter(date=data['date'], start_time=int(data['start_time']))
@@ -83,49 +112,52 @@ def delete_activity(request):
     except Activity.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     
-    #check Activity belongs to user that's querying
-    user = request.user
-    if user != activity.user:
-        return Response({'response': "You don't have permission to delete this"})
+    #check Activity belongs to account that's querying
+    account = request.user
+    if account != activity.account:
+        return Response({'response': "You don't have permission to delete this"}, status=401)
     
-    email_TO = activity.user.email
+    email_TO = activity.account.email
     start_time = activity.start_time
     activity.delete()
 
     title = 'NO REPLY'
     message = "Hi {}, \n\n This is a friendly message notifying your lesson time cancellation: {}:00".format(activity.name, str(start_time))
 
-    send_mail(
-        title,
-        message,
-        'settings.EMAIL_HOST_USER',
-        [email_TO],
-        fail_silently=False
-    )
+    if activity.type != "block":
+        send_mail(
+            title,
+            message,
+            'settings.EMAIL_HOST_USER',
+            [email_TO],
+            fail_silently=False
+        )
 
     return HttpResponse(200)
 
 
 # {"activities": [
-#   {"type": "block", "week": 3, "date": "2023-08-31", "day":  "monday", "start_time": 9}, 
-#   {"type": "block", "week": 3, "date": "2023-08-31", "day":  "monday", "start_time": 10},
-#   {"type": "block", "week": 3, "date": "2023-08-31", "day":  "monday", "start_time": 11}
+#   {"type": "block", "week": 3, "date": "2023-08-2", "day":  "tuesday", "start_time": 9}, 
+#   {"type": "block", "week": 3, "date": "2023-08-2", "day":  "tuesday", "start_time": 10},
+#   {"type": "block", "week": 3, "date": "2023-08-2", "day":  "tuesday", "start_time": 11}
 # ]}
 @api_view(['POST']) 
 @permission_classes([AllowAny])
 def block_times(request):
     # check if superuser
-    # user = request.user
-    user = User.objects.all()[0]
-    if user.is_superuser != True:
+    # account = request.user
+    Account = get_user_model()
+    account = Account.objects.all()[0]
+    if account.is_superuser != True:
         return Response({"Response": "You don't have permission to block time slots"})
     
     data = request.data
     response = []
     for object in data['activities']:
-        activity = Activity(user=user, name="unavailable", notes="unavailable")
+        activity = Activity(account=account, name="unavailable")
 
         #save new Activity object to database
+        print(object)
         serializer = ActivitySerializer(activity, object)
         if serializer.is_valid():
             serializer.save()
@@ -144,7 +176,7 @@ def create_swap_request(request):
     activity_2 = Activity.objects.get(pk=data['activity_2'])
     print(activity_1.name, activity_2.name)
     
-    if activity_1.user != request.user:
+    if activity_1.account != request.user:
         return Response({"response": "you don't have permission to request this swap"})
 
 
@@ -165,7 +197,7 @@ def accept_swap_request(request):
     activity_1 = swap_request.activity_1
     activity_2 = swap_request.activity_2
 
-    if activity_2.user != request.user:
+    if activity_2.account != request.user:
         return Response({"response": "you don't have permission to accept this swap"})
 
     #swap dates

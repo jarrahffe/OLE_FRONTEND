@@ -32,6 +32,7 @@ const TimeGrid = () => {
     },
   });
 
+
   // Generates an array of grid cells. Then formatted as a matrix with css
   function generateCells() {
     const data: Activity[] = JSON.parse(window.sessionStorage.getItem("data") || "[]")
@@ -49,7 +50,7 @@ const TimeGrid = () => {
         const date = dateMap.get(map.get(j).slice(0,3));
         const activity = data.find(activity => activity.start_time === i + 8 && activity.date === date);
         const id = activity ? activity.id : `${date}:${i + 8}`
-        cellArray.push(<GridCell activity={activity} id={id} key={`${id}:${selectedWeek}`} day={map.get(j)} time={i + 8} />)
+        cellArray.push(<GridCell activity={activity} id={id} key={`${id}:${selectedWeek}`} day={map.get(j)} time={i + 8} dragging={dragging}/>)
       }
     }
     return cellArray;
@@ -63,6 +64,7 @@ const TimeGrid = () => {
       id='timegrid'
       onMouseDown={() => dragging.current = true}
       onMouseUp={() => dragging.current = false}
+      onMouseLeave={() => dragging.current = false}
       >
         { transition((style, modal) =>
         modal ?
@@ -70,11 +72,7 @@ const TimeGrid = () => {
           style={style}
           className='multiselect-modal-outer'
           >
-            <MultiSelectModal
-            setModal={setMultiSelectModal}
-            multiActivities={multiActivities}
-            setMultiActivities={setMultiActivities}
-            />
+            <MultiSelectModal />
           </animated.div>
         :
         null)}

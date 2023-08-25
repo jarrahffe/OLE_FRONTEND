@@ -27,6 +27,14 @@ type WeekContext = {
 }
 
 
+type UserInfoContext = {
+  firstName: string
+  lastName: string
+  email: string
+  token: string
+}
+
+
 type MultiSelectContext = {
   blockSelect: boolean
   setBlockSelect: React.Dispatch<React.SetStateAction<boolean>>
@@ -34,6 +42,8 @@ type MultiSelectContext = {
   setEventSelect: React.Dispatch<React.SetStateAction<boolean>>
   multiActivities: Map<Activity, Function> | undefined
   setMultiActivities: React.Dispatch<React.SetStateAction<Map<Activity, Function> | undefined>>
+  multiDelete: Map<Activity, Function> | undefined
+  setMultiDelete: React.Dispatch<React.SetStateAction<Map<Activity, Function> | undefined>>
   multiSelectModal: boolean
   setMultiSelectModal: React.Dispatch<React.SetStateAction<boolean>>
 }
@@ -44,6 +54,7 @@ const DayCardContext = React.createContext({} as DayCardContext);
 const DateMapContext = React.createContext({} as DateMapContext);
 const WeekContext = React.createContext({} as WeekContext);
 const MultiSelectContext = React.createContext({} as MultiSelectContext)
+const UserInfoContext = React.createContext({} as UserInfoContext)
 
 export {
   ClickContext,
@@ -51,5 +62,6 @@ export {
   DayCardContext,
   DateMapContext,
   WeekContext,
-  MultiSelectContext
+  MultiSelectContext,
+  UserInfoContext
 }

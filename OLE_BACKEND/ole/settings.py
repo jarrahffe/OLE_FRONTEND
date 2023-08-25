@@ -39,8 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'timetable',
+    'accounts',
 
-    'users.apps.UsersConfig',
     'corsheaders',
     'rest_framework.authtoken',
 ]
@@ -52,8 +52,10 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated' 
     ]
-    
 }
+
+AUTH_USER_MODEL = 'accounts.Account'
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -152,5 +154,3 @@ CORS_ORIGIN_ALLOW_ALL = True
 # CORS_ORIGIN_WHITELIST = [
 #   'http://localhost:5173'
 # ]
-
-

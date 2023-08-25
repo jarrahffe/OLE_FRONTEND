@@ -10,19 +10,18 @@ export type RequestActivity = {
   notes?: string
   week: number
   date: string
-  user?: number
+  account?: number
 }
-
 
 export type BlockTimes = {
   activities: RequestActivity[]
 }
 
-async function blockRequest(blockTimes: BlockTimes, status: Array<number>) {
+async function blockRequest(blockTimes: BlockTimes, status: Array<number>, token: string) {
   axios.post(`${import.meta.env.VITE_BE_API_BLOCK_TIMES}`, blockTimes,
     {
       headers: {
-        "Authorization": "Token 8940ed69bf244a3df1ac426124cf338bebc8b91d"
+        "Authorization": `Token ${token}`
       }
     }).then(async function(response) {
 
@@ -31,7 +30,7 @@ async function blockRequest(blockTimes: BlockTimes, status: Array<number>) {
         const storageData: Activity[] = JSON.parse(window.sessionStorage.getItem("data") as string);
 
         blockArr.forEach((activity) => {
-          delete activity.user;
+          delete activity.account;
           storageData.push(activity as Activity)
         })
 
@@ -41,17 +40,17 @@ async function blockRequest(blockTimes: BlockTimes, status: Array<number>) {
     });
 }
 
-async function bookRequest(activity: RequestActivity, status: Array<number>) {
+async function bookRequest(activity: RequestActivity, status: Array<number>, token: string, setBookProgress: Function = () => {}, setClicked: Function = () => {}) {
 
   axios.post(`${import.meta.env.VITE_BE_API_ADD_ACTIVITY}`, activity,
     {
       headers: {
-        "Authorization": "Token 8940ed69bf244a3df1ac426124cf338bebc8b91d"
+        "Authorization": `Token ${token}`
       }
     }).then(async function(response) {
 
       if (response.status === 200) {
-        delete response.data.user;
+        delete response.data.account;
         const returnedObj: Activity = response.data;
 
         const storageData: Activity[] = JSON.parse(window.sessionStorage.getItem("data") as string);
@@ -60,8 +59,77 @@ async function bookRequest(activity: RequestActivity, status: Array<number>) {
         window.sessionStorage.setItem("data", JSON.stringify(storageData));
         status[0] = response.status;
       }
+      await sleep(750);
+      setBookProgress(false);
+      setClicked("");
     });
 }
 
+export type RegisterResponse = {
+  first_name: string
+  last_name: string
+  email: string
+  response?: string
+  token: string
+}
 
-export { bookRequest, blockRequest }
+
+async function register(firstName: string, lastName: string, email: string, password: string) {
+  const registerObj = {
+    first_name: firstName,
+    last_name: lastName,
+    email: email,
+    password: password,
+    password2: password
+  }
+  axios.post(`${import.meta.env.VITE_BE_API_REGISTER}`, registerObj).then(response => {
+    const res: RegisterResponse = response.data;
+    console.log(response.data);
+    window.localStorage.setItem("user", JSON.stringify(res));
+    location.reload()
+  });
+}
+
+async function login(email: string, password: string, error: Function) {
+  const loginObj = {
+    username: email,
+    password: password
+  }
+
+  axios.post(`${import.meta.env.VITE_BE_API_LOGIN}`, loginObj).then(response => {
+    if (response.status === 200) {
+      const res: RegisterResponse = response.data;
+      delete res.response;
+      window.localStorage.setItem("user", JSON.stringify(res));
+      console.log(response.data)
+      location.reload();
+    }
+    else {
+      console.log(response.status)
+    }
+  });
+}
+
+
+async function deleteActivity(id: string, token: string) {
+
+  let storageData: Activity[] = JSON.parse(window.sessionStorage.getItem("data") as string);
+  storageData = storageData.filter(o => o.id !== id);
+  window.sessionStorage.setItem("data", JSON.stringify(storageData));
+
+  axios.delete(`${import.meta.env.VITE_BE_API_DELETE_ACTIVITY}`, {
+    headers: {
+      "Authorization": `Token ${token}`
+    },
+    params: {
+      id: id
+    }
+  });
+}
+
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+export { bookRequest, blockRequest, register, login, deleteActivity }

@@ -2,46 +2,51 @@ import { Box, Button, Input, Paper, TextField, Typography } from '@mui/material'
 import React from 'react'
 import moment from 'moment'
 import { Activity } from '../../../config/activity'
-import { RequestActivity, blockRequest, bookRequest } from '../../../helpers/RequestHelpers'
-import { MultiSelectContext } from '../../../contexts'
+import { RequestActivity, blockRequest, bookRequest, deleteActivity } from '../../../helpers/RequestHelpers'
+import { MultiSelectContext, UserInfoContext } from '../../../contexts'
 
-type Props = {
-  setModal: React.Dispatch<React.SetStateAction<boolean>>
-  multiActivities: Map<Activity, Function>|undefined
-  setMultiActivities: React.Dispatch<React.SetStateAction<Map<Activity, Function>|undefined>>
-}
 
-const MultiSelectModal = (props: Props) => {
+const MultiSelectModal = () => {
 
-  const { eventSelect, blockSelect } = React.useContext(MultiSelectContext);
+  const { eventSelect, multiActivities, setMultiActivities, multiDelete, setMultiDelete, setMultiSelectModal } = React.useContext(MultiSelectContext);
   const [eventName, setEventName] = React.useState("Studio");
+  const { token } = React.useContext(UserInfoContext);
 
   async function handleConfirm() {
     if (eventSelect) {
-      for (const activity of (props.multiActivities as Map<Activity, Function>).keys()) {
-        const reqActivity: RequestActivity = activity;
-        reqActivity.name = eventName;
-        delete reqActivity.id;
-        const status: Array<number> = [];
-        await bookRequest(reqActivity, status);
+      if (multiActivities) {
+        for (const activity of (multiActivities as Map<Activity, Function>).keys()) {
+          const reqActivity: RequestActivity = activity;
+          reqActivity.name = eventName;
+          delete reqActivity.id;
+          const status: Array<number> = [];
+          bookRequest(reqActivity, status, token);
+        }
       }
     }
     else {
       const blockActivities: RequestActivity[] = [];
       const status: Array<number> = [];
 
-      for (const activity of (props.multiActivities as Map<Activity, Function>).keys()) {
-        const reqActivity: RequestActivity = activity;
-        delete reqActivity.id;
-        delete reqActivity.name;
-        delete reqActivity.notes;
-        blockActivities.push(reqActivity);
+      if (multiActivities) {
+        for (const activity of (multiActivities as Map<Activity, Function>).keys()) {
+          const reqActivity: RequestActivity = activity;
+          delete reqActivity.id;
+          delete reqActivity.name;
+          delete reqActivity.notes;
+          blockActivities.push(reqActivity);
+        }
+        blockRequest({activities: blockActivities}, status, token);
       }
-      await blockRequest({activities: blockActivities}, status);
-
     }
-    props.setModal(false);
-    props.setMultiActivities(undefined);
+    if (multiDelete) {
+      for (const activity of (multiDelete as Map<Activity, Function>).keys()) {
+        deleteActivity(activity.id, token);
+      }
+    }
+    setMultiDelete(undefined);
+    setMultiSelectModal(false);
+    setMultiActivities(undefined);
   }
 
   return (
@@ -52,9 +57,9 @@ const MultiSelectModal = (props: Props) => {
       </Typography>
 
       <Paper sx={{width: "80%", height: "50%", display: "flex", flexDirection: "column", overflowY:"scroll", alignItems: "center"}}>
-        { props.multiActivities !== undefined ?
+        { multiActivities !== undefined ?
 
-          [...props.multiActivities.keys()].sort((a, b) => {
+          [...multiActivities.keys()].sort((a, b) => {
             return moment(`${a.date}-${a.start_time}`, "YYYY-MM-DD-kk").isBefore(moment(`${b.date}-${b.start_time}`, "YYYY-MM-DD-kk")) ? -1 : 1
           }).map(activity =>
           <Paper key={`${activity.date}:${activity.start_time}`} sx={{width: "80%", height: "50%", margin: "2.5%", display: "flex", justifyContent: "center", alignItems: "center"}}>
@@ -81,7 +86,7 @@ const MultiSelectModal = (props: Props) => {
       }
 
         <Box sx={{display: "flex", justifyContent: "space-evenly",  width: "60%"}}>
-          <Button variant='contained' color='error' onClick={() => props.setModal(false)}>
+          <Button variant='contained' color='error' onClick={() => setMultiSelectModal(false)}>
             Cancel
           </Button>
 

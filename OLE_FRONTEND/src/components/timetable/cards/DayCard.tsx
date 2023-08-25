@@ -39,7 +39,7 @@ const DayCard = (props: Props) => {
           color: "black"
         },
         to: {
-          backgroundColor: "#1e88e5",
+          backgroundColor: "rgb(34,34,34)",
           boxShadow: "3px 3px 5px #90a4ae",
           color: "white"
         },
@@ -49,7 +49,7 @@ const DayCard = (props: Props) => {
       setHovered(false);
       api.start({
         from: {
-          backgroundColor: "#1e88e5",
+          backgroundColor: "rgb(34,34,34)",
           boxShadow: "3px 3px 5px #90a4ae",
           color: "white"
         },
