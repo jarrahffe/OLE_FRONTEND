@@ -1,14 +1,13 @@
 import React from 'react';
-import { DateMapContext } from '../../../contexts';
+import { DateMapContext, WeekContext } from '../../../contexts';
 import { Typography } from '@mui/material';
 import { useSpring, animated } from '@react-spring/web';
 import { DayCardContext } from '../../../contexts';
+import moment from 'moment';
 
 type Props = {
   day: string
 }
-
-const DATE_FONT_SIZE = window.innerWidth < 601 ? "" : "h6";
 
 const DayCard = (props: Props) => {
 
@@ -16,31 +15,30 @@ const DayCard = (props: Props) => {
   const [hovered, setHovered] = React.useState(false);
   const { dateMap } = React.useContext(DateMapContext);
 
-  const currentIsoDate = dateMap.get(props.day.slice(0, 3).toLocaleLowerCase())?.split("-");
-  const day = removeLeadingZeros(currentIsoDate?.at(2) as string)
-  const month = removeLeadingZeros(currentIsoDate?.at(1) as string)
-
+  const currentIsoDate = dateMap.get(props.day.slice(0, 3).toLowerCase())?.split("-");
+  const day = removeLeadingZeros(currentIsoDate?.at(2) as string);
+  const month = removeLeadingZeros(currentIsoDate?.at(1) as string);
+  const isCurrentDay = dateMap.get(props.day.slice(0, 3).toLowerCase()) === moment().format("YYYY-MM-DD");
 
   const [springs, api] = useSpring(() => ({
     from: {
       backgroundColor: "#eceff1",
-      boxShadow: "2px 2px 3px #cfd8dc",
       color: "black"
     }
   }));
 
   React.useEffect(() => {
+    if (isCurrentDay) return;
+
     if (dayCard === props.day.toLocaleLowerCase().slice(0, 3)) {
       setHovered(true);
       api.start({
         from: {
           backgroundColor: "#eceff1",
-          boxShadow: "2px 2px 3px #cfd8dc",
           color: "black"
         },
         to: {
           backgroundColor: "rgb(34,34,34)",
-          boxShadow: "3px 3px 5px #90a4ae",
           color: "white"
         },
       });
@@ -50,12 +48,10 @@ const DayCard = (props: Props) => {
       api.start({
         from: {
           backgroundColor: "rgb(34,34,34)",
-          boxShadow: "3px 3px 5px #90a4ae",
           color: "white"
         },
         to: {
           backgroundColor: "#eceff1",
-          boxShadow: "2px 2px 3px #cfd8dc",
           color: "black"
         }
       });
@@ -64,14 +60,28 @@ const DayCard = (props: Props) => {
 
   return (
     <div className="day-card">
-      <animated.div className='day-card-day-date' style={{ ...springs }}>
-        {
-          window.innerWidth < 601 ?
-            <p>{props.day} {day}/{month}</p>
-            :
-            <h4>{props.day} {day}/{month}</h4>
-        }
-      </animated.div>
+      {
+        isCurrentDay ?
+          <div className="day-card-day-date"
+          style={{backgroundColor: "#b71c1c", color: "white", opacity: moment().hours() + 1 >= 20 ? "25%" : "100%"}}>
+            {
+              window.innerWidth < 601 ?
+                <p>{props.day} {day}/{month}</p>
+                :
+                <h4>{props.day} {day}/{month}</h4>
+            }
+          </div>
+          :
+          <animated.div className='day-card-day-date'
+          style={{...springs, opacity: moment().isAfter(moment(currentIsoDate?.join("-"), "YYYY-MM-DD")) ? "25%" : "100%"}}>
+            {
+              window.innerWidth < 601 ?
+                <p>{props.day} {day}/{month}</p>
+                :
+                <h4>{props.day} {day}/{month}</h4>
+            }
+          </animated.div>
+      }
     </div>
   )
 }

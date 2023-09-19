@@ -32,6 +32,8 @@ type UserInfoContext = {
   lastName: string
   email: string
   token: string
+  account: number
+  isSuperUser: boolean
 }
 
 
@@ -48,6 +50,13 @@ type MultiSelectContext = {
   setMultiSelectModal: React.Dispatch<React.SetStateAction<boolean>>
 }
 
+type SwapContext = {
+  swapMenuModal: boolean
+  setSwapMenuModal: React.Dispatch<React.SetStateAction<boolean>>
+  swapHubModal: boolean
+  setSwapHubModal: React.Dispatch<React.SetStateAction<boolean>>
+}
+
 const ClickContext = React.createContext({} as ClickContext);
 const TimeCardContext = React.createContext({} as TimeCardContext);
 const DayCardContext = React.createContext({} as DayCardContext);
@@ -55,6 +64,7 @@ const DateMapContext = React.createContext({} as DateMapContext);
 const WeekContext = React.createContext({} as WeekContext);
 const MultiSelectContext = React.createContext({} as MultiSelectContext)
 const UserInfoContext = React.createContext({} as UserInfoContext)
+const SwapContext = React.createContext({} as SwapContext);
 
 export {
   ClickContext,
@@ -63,5 +73,6 @@ export {
   DateMapContext,
   WeekContext,
   MultiSelectContext,
-  UserInfoContext
+  UserInfoContext,
+  SwapContext
 }

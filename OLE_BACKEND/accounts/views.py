@@ -26,7 +26,8 @@ class CustomAuthToken(ObtainAuthToken):
             'email': account.email,
             'first_name': account.first_name,
             'last_name': account.last_name,
-            'account_id': account.pk,
+            'account': account.pk,
+            'is_superuser': account.is_superuser,
         })
     
 
@@ -40,6 +41,8 @@ def registration_view(request):
         data = {}
         if serializer.is_valid():
             account = serializer.save()
+            data['account'] = account.id
+            data['is_superuser'] = account.is_superuser
             data['response'] = "succesfully registered a new account"
             data['email'] = account.email
             data['first_name'] = account.first_name

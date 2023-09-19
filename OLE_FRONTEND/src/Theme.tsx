@@ -26,8 +26,7 @@ const Theme = createTheme({
     // RED
     success: {
       main: "#b71c1c"
-    }
-
+    },
 
   }
 });

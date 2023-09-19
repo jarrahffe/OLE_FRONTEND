@@ -1,4 +1,4 @@
-import { Activity, makeActivity } from "../config/activity";
+import { Activity } from "../config/activity";
 import axios from "axios";
 
 export type RequestActivity = {
@@ -50,7 +50,6 @@ async function bookRequest(activity: RequestActivity, status: Array<number>, tok
     }).then(async function(response) {
 
       if (response.status === 200) {
-        delete response.data.account;
         const returnedObj: Activity = response.data;
 
         const storageData: Activity[] = JSON.parse(window.sessionStorage.getItem("data") as string);
@@ -71,6 +70,7 @@ export type RegisterResponse = {
   email: string
   response?: string
   token: string
+  rememberMe: boolean
 }
 
 
@@ -90,7 +90,7 @@ async function register(firstName: string, lastName: string, email: string, pass
   });
 }
 
-async function login(email: string, password: string, error: Function) {
+function login(email: string, password: string, error: Function, rememberMe: boolean) {
   const loginObj = {
     username: email,
     password: password
@@ -99,9 +99,9 @@ async function login(email: string, password: string, error: Function) {
   axios.post(`${import.meta.env.VITE_BE_API_LOGIN}`, loginObj).then(response => {
     if (response.status === 200) {
       const res: RegisterResponse = response.data;
-      delete res.response;
+      res.rememberMe = rememberMe;
+      console.log(res)
       window.localStorage.setItem("user", JSON.stringify(res));
-      console.log(response.data)
       location.reload();
     }
     else {

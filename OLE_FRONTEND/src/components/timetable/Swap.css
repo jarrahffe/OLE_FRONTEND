@@ -1,0 +1,100 @@
+.swapmodal-inner {
+  width: 40%;
+  height: 80%;
+  background-color: #eceff1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  border-radius: 0.5rem;
+}
+
+.swapmodal-inner-content {
+  width: 80%;
+  background-color: white;
+  border-radius: 0.5rem;
+  display: flex;
+  align-content: center;
+  justify-content: space-evenly;
+  height: 60%;
+}
+
+.swapmodal-inner-content-lessons {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.swapmodal-inner-content-lessons-items {
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  height: 65%;
+  align-items: center;
+  position: relative;
+  top: 19%
+}
+
+.swapmodal-inner-content-swaphub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 100%;
+}
+
+/* ****************************************** */
+
+.swaphubmodal-inner-content {
+  width: 100%;
+  border-radius: 0.5rem;
+  display: flex;
+  position: relative;
+  align-content: center;
+  justify-content: space-evenly;
+  height: 75%;
+}
+
+.swaphubmodal-inner-content-box {
+  width: 45%;
+  height: 100%;
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background-color: white;
+  border-radius: 0.5rem;
+}
+
+.swaphubmodal-inner-content-items {
+  width: 90%;
+  height: 100%;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  overflow-y: scroll;
+}
+
+.swaphubmodal-item {
+  width: 100%;
+  height: 15%;
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+
+  flex-shrink: 0;
+  background-color: #1976d2;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  margin: 0.5rem;
+}

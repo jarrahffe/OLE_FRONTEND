@@ -113,8 +113,11 @@ def delete_activity(request):
         return Response(status=status.HTTP_404_NOT_FOUND)
     
     #check Activity belongs to account that's querying
+    Account = get_user_model()
+    acc = Account.objects.all()[0]
+
     account = request.user
-    if account != activity.account:
+    if account != activity.account and not acc.is_superuser:
         return Response({'response': "You don't have permission to delete this"}, status=401)
     
     email_TO = activity.account.email

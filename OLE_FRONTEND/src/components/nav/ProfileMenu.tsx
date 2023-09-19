@@ -35,7 +35,7 @@ const ProfileMenu = () => {
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
           >
-            <Avatar sx={{ width: 32, height: 32 }}>{firstName.charAt(0)}</Avatar>
+            <Avatar sx={{ width: 40, height: 40 }}>{firstName.charAt(0)}</Avatar>
           </IconButton>
         </Tooltip>
       </Box>
@@ -76,7 +76,7 @@ const ProfileMenu = () => {
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
 
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={handleClose} sx={{display: "flex", justifyContent: "space-between"}}>
           <Avatar>{firstName.charAt(0)}</Avatar>
           Profile
         </MenuItem>

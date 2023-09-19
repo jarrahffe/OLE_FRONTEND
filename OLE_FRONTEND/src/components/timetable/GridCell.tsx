@@ -1,13 +1,15 @@
 import React from 'react';
-import { Activity, makeActivity } from '../../config/activity';
 import ActivitySelection from './cards/ActivitySelection';
-import { ClickContext, TimeCardContext, DayCardContext, WeekContext, MultiSelectContext, DateMapContext, UserInfoContext } from '../../contexts';
 import ActivitySelectionPlaceholder from './cards/ActivitySelectionPlaceholder';
-import { animated, useSpring, useTransition } from '@react-spring/web';
-import { IconButton, Menu, MenuItem } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import moment from 'moment';
+import { Activity, makeActivity } from '../../config/activity';
+import { ClickContext, TimeCardContext, DayCardContext, WeekContext, MultiSelectContext, DateMapContext, UserInfoContext, SwapContext } from '../../contexts';
+import { animated, useSpring, useTransition } from '@react-spring/web';
+import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import { deleteActivity } from '../../helpers/RequestHelpers';
-
+import { CURRENT_WEEK } from '../../config/CurrentWeek';
 
 const BLOCK_NAME = "block";
 
@@ -17,46 +19,48 @@ type Props = {
   day: string
   time: number
   dragging: React.MutableRefObject<boolean>
+  setSwapped: React.Dispatch<React.SetStateAction<Activity|undefined>>
+  irlMinute: number
 }
 
 const GridCell = (props: Props) => {
 
-  const map = new Map();
-  // light blue
-  map.set("lesson", "#1565c0");
-  // MUI light grey #37474f
-  map.set("block", "#607d8b");
-  // dark blue
-  map.set("special", "#283593");
-
-  map.set("select", "#eceff1");
-
+  // Contexts
   const { clicked, setClicked } = React.useContext(ClickContext);
   const { selectedWeek } = React.useContext(WeekContext);
   const { timeCard, setTimeCard } = React.useContext(TimeCardContext);
   const { dayCard, setDayCard } = React.useContext(DayCardContext);
   const { blockSelect, eventSelect, multiActivities, setMultiActivities, multiDelete, setMultiDelete } = React.useContext(MultiSelectContext);
   const { dateMap } = React.useContext(DateMapContext);
+  const { firstName, token, account, isSuperUser } = React.useContext(UserInfoContext);
+  const { setSwapMenuModal } = React.useContext(SwapContext);
+
+  const gridCellDate = dateMap.get(props.day.slice(0, 3)) as string;
+
+  // State
   const [activity, setActivity] = React.useState(props.activity);
-  const { firstName, token } = React.useContext(UserInfoContext);
   const [name, setName] = React.useState(firstName);
   const [opacity, setOpacity] = React.useState("100%")
+  const [deleteAnchorEl, setDeleteAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [swapAnchorEl, setSwapAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [pastTimeTooltip, setPastTimeTooltip] = React.useState(false);
+  const isInCurrentHourBracket = props.time === moment().hour() && gridCellDate === moment().format("YYYY-MM-DD");
 
-  // Delete icon menu
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleDeleteMenuClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-
+  // Constants
   const time = props.time % 12 === 0 ? 12 : props.time % 12;
-
   const beingDragged = React.useRef(false);
+  const deleteOpen = Boolean(deleteAnchorEl);
+  const swapOpen = Boolean(swapAnchorEl);
+  const hasExpired = moment().isAfter(moment(`${gridCellDate}-${props.time}`, "YYYY-MM-DD-kk"));
+  const isTwoWeeksInAdvance = selectedWeek - CURRENT_WEEK > 1;
 
+  const map = new Map();
+  map.set("lesson", "#1565c0");
+  map.set("block", "#607d8b");
+  map.set("special", "#283593");
+  map.set("select", "#eceff1");
+
+  // Animations
   const transition = useTransition(clicked, {
     from: {
       height: "0%",
@@ -71,7 +75,7 @@ const GridCell = (props: Props) => {
       height: "0%",
       opacity: "0%"
     },
-  })
+  });
 
   const [springs, api] = useSpring(() => ({
     from: {
@@ -79,7 +83,6 @@ const GridCell = (props: Props) => {
     },
   }));
 
-  // Animate on render
   React.useEffect(() => {
     api.start({
       from: {
@@ -92,8 +95,27 @@ const GridCell = (props: Props) => {
   }, []);
 
 
+  // Functions
+  function handleDeleteMenuClick(event: React.MouseEvent<HTMLElement>) {
+    setDeleteAnchorEl(event.currentTarget);
+  };
+
+  function handleSwapMenuClick(event: React.MouseEvent<HTMLElement>) {
+    setSwapAnchorEl(event.currentTarget);
+  };
+
+  function handleDeleteClose() {
+    setDeleteAnchorEl(null);
+  };
+
+  function handleSwapClose() {
+    setSwapAnchorEl(null);
+  };
+
   // Set currently clicked cell
-  const handleClick = () => {
+  function handleClick() {
+    if (hasExpired) return;
+
     if (blockSelect || eventSelect) {
 
       if (activity && multiActivities && multiActivities.has(activity)) {
@@ -111,12 +133,12 @@ const GridCell = (props: Props) => {
       else if (activity) {
         if ((blockSelect && activity.type !== "block") || (eventSelect && activity.type !== "special")) return;
         setMultiDelete(multiDelete ? multiDelete.set(activity, setOpacity) : new Map<Activity, Function>([[activity, setOpacity]]));
-        setOpacity("40%")
+        setOpacity("25%")
       }
 
       else {
-        const newActivity =  blockSelect ? makeActivity(props.id, "block", "block", props.day, props.time, "", selectedWeek, dateMap.get(props.day.slice(0,3)) as string)
-        : makeActivity(props.id, "special", "", props.day, props.time, "", selectedWeek, dateMap.get(props.day.slice(0,3)) as string);
+        const newActivity =  blockSelect ? makeActivity(props.id, "block", "block", props.day, props.time, "", selectedWeek, gridCellDate, account)
+        : makeActivity(props.id, "special", "", props.day, props.time, "", selectedWeek, gridCellDate, account);
 
         setActivity(newActivity);
         if (multiActivities) setMultiActivities(multiActivities.set(newActivity, setActivity))
@@ -139,17 +161,26 @@ const GridCell = (props: Props) => {
   }
 
   // Remove day/time card
-  const handleLeave = () => {
+  function handleLeave() {
     beingDragged.current = false;
     setDayCard("");
     setTimeCard(-1);
   }
 
-  const handleMouseDown = () => {
+  function handleMouseDown() {
     if (!beingDragged.current && (blockSelect || eventSelect)) {
       beingDragged.current = true
-      handleClick()
     }
+    handleClick()
+  }
+
+  function isAfterCurrentDate() {
+    return moment(gridCellDate).isAfter(moment());
+  }
+
+  function createSwapRequest() {
+    props.setSwapped(props.activity);
+    setSwapMenuModal(true);
   }
 
   return activity ?
@@ -168,19 +199,21 @@ const GridCell = (props: Props) => {
                 <div className="grid-cell-multi-select" style={{backgroundColor: map.get(activity.type)}}/>
             </div>
           :
-            <div className="grid-cell-activity" style={{ backgroundColor: map.get(activity.type), opacity: opacity}} >
+            <div className="grid-cell-activity" style={{ backgroundColor: map.get(activity.type), opacity: hasExpired ? "25%" : opacity}} >
               {
-                dayCard === props.day.toLowerCase().slice(0, 3) && timeCard === time  && !blockSelect && !eventSelect ?
-                  <IconButton onClick={handleDeleteMenuClick} sx={{position: "absolute", right: "5%"}}><DeleteIcon htmlColor='gray'/></IconButton>
+                dayCard === props.day.toLowerCase().slice(0, 3) && timeCard === time && !blockSelect && !eventSelect && (props.activity?.account === account || isSuperUser) && !hasExpired ?
+                  <Tooltip title="Delete">
+                    <IconButton onClick={handleDeleteMenuClick} sx={{position: "absolute", right: "5%"}}><DeleteIcon htmlColor='lightgray'/></IconButton>
+                  </Tooltip>
                 :
                 null
               }
               <Menu
-                anchorEl={anchorEl}
+                anchorEl={deleteAnchorEl}
                 id="account-menu"
-                open={open}
-                onClose={handleClose}
-                onClick={handleClose}
+                open={deleteOpen}
+                onClose={handleDeleteClose}
+                onClick={handleDeleteClose}
                 sx={{
                   elevation: 0,
                   sx: {
@@ -220,33 +253,125 @@ const GridCell = (props: Props) => {
 
               </Menu>
 
+              {
+                 dayCard === props.day.toLowerCase().slice(0, 3) && timeCard === time && !blockSelect && !eventSelect && props.activity?.account !== account && token && isAfterCurrentDate() && !hasExpired && props.activity?.type === "lesson"?
+                  <Tooltip title="Swap">
+                    <IconButton onClick={handleSwapMenuClick} sx={{position: "absolute", left: "5%"}}><SwapHorizIcon htmlColor='lightgray'/></IconButton>
+                  </Tooltip>
+                :
+                null
+              }
+              <Menu
+                anchorEl={swapAnchorEl}
+                id="account-menu"
+                open={swapOpen}
+                onClose={handleSwapClose}
+                onClick={handleSwapClose}
+                sx={{
+                  elevation: 0,
+                  sx: {
+                    overflow: 'visible',
+                    filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                    mt: 1.5,
+                    '& .MuiAvatar-root': {
+                      width: 32,
+                      height: 32,
+                      ml: -0.5,
+                      mr: 1,
+                    },
+                    '&:before': {
+                      content: '""',
+                      display: 'block',
+                      position: 'absolute',
+                      top: 0,
+                      right: 14,
+                      width: 10,
+                      height: 10,
+                      bgcolor: 'background.paper',
+                      transform: 'translateY(-50%) rotate(45deg)',
+                      zIndex: 0,
+                    },
+                  },
+                }}
+                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+              >
+
+                <MenuItem onClick={() => createSwapRequest()}>
+                  Create Swap Request
+                </MenuItem>
+
+              </Menu>
+
               <div className='grid-cell-name' style={{textDecoration: opacity !== "100%" ? "line-through" : "none"}}>
                 { activity.type !== BLOCK_NAME ?  <p>{activity.name}</p> : null }
               </div>
+
+              {
+                clicked !== props.id && isInCurrentHourBracket ?
+                  <>
+                    <div className="grid-cell-time-indicator" style={{top: `${props.irlMinute / 60 * 100}%`}}/>
+                    <div className="grid-cell-time-indicator-ball" style={{top: `${props.irlMinute / 60 * 100 - 7.5}%`}}/>
+                  </>
+                  :
+                  null
+              }
             </div>
         }
       </animated.div>
     ) :
     (
-      <div className="grid-cell-blank"
-      onMouseEnter={() => handleEnter()}
-      onMouseDown={() => handleMouseDown()}
-      onMouseLeave={() => handleLeave()}
-      onMouseUp={() => beingDragged.current = false}
+      <Tooltip
+      PopperProps={{
+        disablePortal: true,
+      }}
+      open={pastTimeTooltip}
+      placement='top'
+      disableFocusListener
+      disableHoverListener
+      disableTouchListener
+      title={hasExpired ? "Time is in the past!" : "Time is more than one week ahead!"}
       >
-        <div className="grid-cell-blank"  onClick={() => handleClick()}/>
-        {
-          transition((style, clicked) =>
-            clicked === props.id ? <animated.div className="activity-selection" style={style}> <ActivitySelection name={name} setName={setName} day={props.day} time={props.time} setActivity={setActivity} /> </animated.div> : null
-          )
-        }
-        {
-          clicked === props.id ?
-            <ActivitySelectionPlaceholder name={name} />
-            :
-            null
-        }
-      </div>
+
+        <div className="grid-cell-blank"
+        onMouseEnter={() => handleEnter()}
+        onMouseDown={() => {
+          if (hasExpired || isTwoWeeksInAdvance) {
+            setPastTimeTooltip(true);
+            setTimeout(() => {
+              setPastTimeTooltip(false);
+            }, 1000);
+          }
+          else if (clicked !== props.id) {
+            handleMouseDown()
+          }
+        }}
+        onMouseLeave={() => handleLeave()}
+        onMouseUp={() => beingDragged.current = false}
+        >
+          <div className="grid-cell-blank" />
+          {
+            transition((style, clicked) =>
+              clicked === props.id ? <animated.div className="activity-selection" style={style}> <ActivitySelection name={name} setName={setName} day={props.day} time={props.time} setActivity={setActivity} /> </animated.div> : null
+            )
+          }
+          {
+            clicked === props.id ?
+              <ActivitySelectionPlaceholder name={name} />
+              :
+              null
+          }
+          {
+            clicked !== props.id && isInCurrentHourBracket ?
+              <>
+                <div className="grid-cell-time-indicator" style={{top: `${props.irlMinute / 60 * 100}%`}}/>
+                <div className="grid-cell-time-indicator-ball" style={{top: `${props.irlMinute / 60 * 100 - 7.5}%`}}/>
+              </>
+              :
+              null
+          }
+        </div>
+      </Tooltip>
     )
 }
 

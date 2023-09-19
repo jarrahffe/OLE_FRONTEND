@@ -1,15 +1,15 @@
 import { Box } from '@mui/system';
-import { Typography, Button, Slider, Switch, FormControlLabel, Alert, IconButton } from '@mui/material';
+import { Typography, Button, Slider, Switch, Alert, IconButton, Badge, Icon, Tooltip } from '@mui/material';
 import React from 'react';
 import moment from 'moment';
-import { DateMapContext, MultiSelectContext, WeekContext } from '../../contexts';
+import { DateMapContext, MultiSelectContext, SwapContext, UserInfoContext, WeekContext } from '../../contexts';
 import { mapDaysToDate } from '../../helpers/DateHelpers';
 import { Activity } from '../../config/activity';
 import ProfileMenu from './ProfileMenu';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import usyd_logo from '../../assets/usyd_logo.png'
-import con_logo from '../../assets/con_logo.png'
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 
 type Props = {
   setLoginModalActive: React.Dispatch<React.SetStateAction<boolean>>
@@ -26,7 +26,7 @@ const NavBar = (props: Props) => {
   const HEADER_DIST_FROM_TOP = isMobile ? "1.5%" : "5%";
   const HEADER_DIST_FROM_SIDE = isMobile ? "0%" : "2.5%";
 
-  const CURRENT_WEEK = moment().diff(moment([2023, 6, 17]), "weeks") + 1;
+  const CURRENT_WEEK = moment().diff(moment("2023-08-07", "YYYY-MM-DD"), "weeks") + 1;
   const NUM_WEEKS_TOTAL = 13;
 
   const { selectedWeek, setSelectedWeek } = React.useContext(WeekContext);
@@ -38,6 +38,10 @@ const NavBar = (props: Props) => {
     multiDelete, setMultiDelete,
     multiSelectModal, setMultiSelectModal
   } = React.useContext(MultiSelectContext);
+
+  const { isSuperUser } = React.useContext(UserInfoContext);
+
+  const { swapHubModal, setSwapHubModal } = React.useContext(SwapContext);
 
   function handleSliderChange(val: number) {
     if (val > 13 || val < 1) return
@@ -90,12 +94,12 @@ const NavBar = (props: Props) => {
       }}>
         {/* <Typography variant={HEADER_FONT_SIZE} component="h5">
           {TEACHER_NAME}'s 🎻 Studio
-        </Typography> */}
+        </Typography> */ }
         <img src={usyd_logo} style={{width: "80%"}}/>
         {/* <img src={con_logo} style={{width: "100%"}}/> */}
       </Box>
 
-      { props.isLoggedIn ?
+      { isSuperUser ?
       <Box sx={{display: "flex", position: "absolute", left: "19%", width: "20%", justifyContent: "space-evenly", alignItems:"center", }}>
         <Box sx={{ display: "flex", flexDirection: "column",  alignItems: "center"}}>
           <Typography sx={{fontSize: "0.8rem"}}>Busy</Typography>
@@ -146,6 +150,7 @@ const NavBar = (props: Props) => {
               />
               <IconButton  sx={{position: "absolute", right: "0%", top: "100%"}} onClick={() => handleSliderChange(selectedWeek + 1)}><ArrowForwardIcon fontSize='small' color='primary'/></IconButton>
               <IconButton sx={{position: "absolute", left: "0%", top: "100%"}} onClick={() => handleSliderChange(selectedWeek - 1)}><ArrowBackIcon fontSize='small' color='primary'/></IconButton>
+              <Button size='small' sx={{position: "absolute", left: "30%", right: "30%", top: "110%"}} onClick={() => handleSliderChange(CURRENT_WEEK)}>This Week</Button>
             </>
             :
             <Alert
@@ -157,6 +162,18 @@ const NavBar = (props: Props) => {
           }
       </Box>
 
+      {
+        props.isLoggedIn ?
+        <Box sx={{position: "absolute", right: "8%"}}>
+            <Tooltip title="Swaps">
+              <IconButton onClick={() => setSwapHubModal(true)} size='large'>
+                <SwapHorizIcon fontSize='large' htmlColor='gray'/>
+              </IconButton>
+            </Tooltip>
+        </Box>
+        :
+        null
+      }
       <Box sx={{
         position: "absolute",
         height: "100%",

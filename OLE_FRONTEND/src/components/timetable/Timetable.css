@@ -104,7 +104,7 @@
   justify-content: center;
   align-items: center;
   background-color: rgba(0, 0, 0, 0.6);
-  z-index: 5;
+  z-index: 10;
 }
 
 .grid-cell-activity, .grid-cell-blank {
@@ -169,6 +169,7 @@
   .grid-cell-blank:hover {
     /* mui 50 */
     background-color: #eceff1;
+
     cursor:pointer;
   }
 }
@@ -178,6 +179,24 @@
   font-weight: 400;
   pointer-events: none;
   user-select: none;
+}
+
+.grid-cell-time-indicator {
+  position: absolute;
+  width: 100%;
+  height: 3%;
+  background-color: red;
+  z-index: 5;
+}
+
+.grid-cell-time-indicator-ball {
+  position: absolute;
+  width: 3%;
+  height: 17.5%;
+  background-color: red;
+  border-radius: 0.5rem;
+  left: -1.5%;
+  z-index: 5;
 }
 
 .refresh-button {
@@ -308,6 +327,7 @@
   position: relative;
   height: 10%;
   width: 40%;
+  top: 2%;
   border-radius: 0.25rem;
   display: flex;
   justify-content: center;
@@ -317,13 +337,20 @@
 
 .login-card-forgot-password {
   position: absolute;
-  width: 100%;
-  height: 10%;
-  bottom: 5%;
+  bottom: 2.5%;
+  right: 0%;
   color: gray;
+  cursor: pointer;
 }
+
 .login-card-forgot-password:hover {
   color: #1565c0
+}
+
+.login-card-remember-me {
+  position: absolute;
+  bottom: 0%;
+  left: 0%;
 }
 
 .login-card-create-account {

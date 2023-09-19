@@ -1,10 +1,9 @@
 import React from 'react'
-import axios from 'axios';
 import { ClickContext, DateMapContext, UserInfoContext, WeekContext } from '../../../contexts';
-import { TextField, Button, CircularProgress } from '@mui/material';
+import { TextField, Button, CircularProgress, Tooltip } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import CloseIcon from '@mui/icons-material/Close'
-import { Activity, makeActivity } from '../../../config/activity';
+import { Activity } from '../../../config/activity';
 import moment from 'moment';
 import { RequestActivity, bookRequest } from '../../../helpers/RequestHelpers';
 
@@ -24,6 +23,7 @@ const ActivitySelection = (props: Props) => {
   const { token } = React.useContext(UserInfoContext)
   const [type, setType] = React.useState("lesson");
   const [bookProgress, setBookProgress] = React.useState(false);
+  const [notLoggedInTooltip, setNotLoggedInTooltip] = React.useState(false);
 
   // The actual name retrieved? from window cookies
   const { firstName } = React.useContext(UserInfoContext);
@@ -54,10 +54,20 @@ const ActivitySelection = (props: Props) => {
     return () => props.setName(firstName)
   }, [])
 
+  function handleSubmit() {
+    if (props.name === "" || !token) {
+      setNotLoggedInTooltip(true);
+      setTimeout(() => {
+        setNotLoggedInTooltip(false);
+      }, 1000);
+    }
+    else handleBook();
+  }
+
   return (
     <>
       <h4 className="activity-selection-header">
-        {props.day.charAt(0).toUpperCase() + props.day.slice(1)}, {monthWord} {dayNum} {":"} {props.time > 12 ? props.time % 12 : props.time}
+        {props.day.charAt(0).toUpperCase() + props.day.slice(1)}, {monthWord} {dayNum}{":"} {props.time > 12 ? props.time % 12 : props.time}
         {props.time > 11 ? "pm" : "am"}
       </h4>
 
@@ -80,20 +90,35 @@ const ActivitySelection = (props: Props) => {
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             props.setName(event.target.value);
           }}
+          onKeyDown={e => {
+            if (e.key === "Enter") e.preventDefault(), handleSubmit();
+          }}
         />
       </div>
 
       <div className='activity-selection-book-button'>
-            <LoadingButton
-              loading={bookProgress}
-              variant='contained'
-              color='secondary'
-              size='small'
-              onClick={() => handleBook()}
-              disableElevation
+        <Tooltip
+          PopperProps={{
+            disablePortal: true,
+          }}
+          open={notLoggedInTooltip}
+          placement='top'
+          disableFocusListener
+          disableHoverListener
+          disableTouchListener
+          title={!token ? "Please log in or register!" : "Please input your name!" }
+        >
+          <LoadingButton
+            loading={bookProgress}
+            variant='contained'
+            color='secondary'
+            size='small'
+            onClick={() => handleSubmit()}
+            disableElevation
             >
-              Book
-            </LoadingButton>
+            Book
+          </LoadingButton>
+        </Tooltip>
       </div>
     </>
   )

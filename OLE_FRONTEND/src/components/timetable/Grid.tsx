@@ -1,23 +1,61 @@
 import React from 'react';
 import { Activity } from '../../config/activity';
 import GridCell from './GridCell';
-import { ClickContext, DateMapContext, DayCardContext, MultiSelectContext, TimeCardContext, WeekContext } from '../../contexts';
+import { ClickContext, DateMapContext, DayCardContext, MultiSelectContext, SwapContext, TimeCardContext, WeekContext } from '../../contexts';
 import MultiSelectModal from './cards/MultiSelectModal';
 import { animated, useTransition } from '@react-spring/web';
+import SwapMenuModal from './cards/SwapMenuModal';
+import moment from 'moment';
+import SwapHubModal from './cards/SwapHubModal';
 
 const TimeGrid = () => {
 
+  const interval = 15;
+
   const [clicked, setClicked] = React.useState("");
+  const [swapped, setSwapped] = React.useState<Activity>();
+  const [irlMinute, setIrlMinute] = React.useState(moment().minute());
 
   const { selectedWeek } = React.useContext(WeekContext);
   const { timeCard } = React.useContext(TimeCardContext);
   const { dayCard } = React.useContext(DayCardContext);
   const { dateMap } = React.useContext(DateMapContext);
   const { multiSelectModal, setMultiSelectModal, multiActivities, setMultiActivities } = React.useContext(MultiSelectContext);
+  const { swapMenuModal, setSwapMenuModal, swapHubModal, setSwapHubModal } = React.useContext(SwapContext);
 
   const dragging = React.useRef(false);
 
-  const transition = useTransition(multiSelectModal, {
+  const multiSelectTransition = useTransition(multiSelectModal, {
+    from: {
+      height: "0%",
+      opacity: "0%"
+    },
+    enter: {
+      height: "100%",
+      opacity: "100%"
+    },
+    leave: {
+      height: "0%",
+      opacity: "0%"
+    },
+  });
+
+  const swapMenuTransition = useTransition(swapMenuModal, {
+    from: {
+      height: "0%",
+      opacity: "0%"
+    },
+    enter: {
+      height: "100%",
+      opacity: "100%"
+    },
+    leave: {
+      height: "0%",
+      opacity: "0%"
+    },
+  });
+
+  const swapHubTransition = useTransition(swapHubModal, {
     from: {
       height: "0%",
       opacity: "0%"
@@ -50,13 +88,26 @@ const TimeGrid = () => {
         const date = dateMap.get(map.get(j).slice(0,3));
         const activity = data.find(activity => activity.start_time === i + 8 && activity.date === date);
         const id = activity ? activity.id : `${date}:${i + 8}`
-        cellArray.push(<GridCell activity={activity} id={id} key={`${id}:${selectedWeek}`} day={map.get(j)} time={i + 8} dragging={dragging}/>)
+        cellArray.push(<GridCell activity={activity} id={id} key={`${id}:${selectedWeek}`} day={map.get(j)} time={i + 8} dragging={dragging} setSwapped={setSwapped} irlMinute={irlMinute}/>)
       }
     }
     return cellArray;
   }
 
   const cellArray = generateCells();
+
+  function repeatEvery() {
+    const now = moment().minute(), delay = interval - now % interval;
+    function start() {
+      setIrlMinute(moment().minute());
+      repeatEvery();
+    }
+    setTimeout(start, delay);
+  }
+
+  React.useEffect(() => {
+    repeatEvery();
+  }, []);
 
   return (
     <ClickContext.Provider value={{clicked, setClicked}}>
@@ -66,18 +117,46 @@ const TimeGrid = () => {
       onMouseUp={() => dragging.current = false}
       onMouseLeave={() => dragging.current = false}
       >
-        { transition((style, modal) =>
-        modal ?
-          <animated.div
-          style={style}
-          className='multiselect-modal-outer'
-          >
-            <MultiSelectModal />
-          </animated.div>
-        :
-        null)}
+        { multiSelectTransition((style, modal) =>
+          modal ?
+            <animated.div
+            style={style}
+            className='multiselect-modal-outer'
+            onClick={() => setMultiSelectModal(false)}
+            >
+              <MultiSelectModal />
+            </animated.div>
+          :
+          null)
+        }
 
-        {cellArray}
+        { swapMenuTransition((style, modal) =>
+          modal ?
+            <animated.div
+            style={style}
+            className='multiselect-modal-outer'
+            onClick={() => setSwapMenuModal(false)}
+            >
+              <SwapMenuModal swapped={swapped} setSwapped={setSwapped}/>
+            </animated.div>
+          :
+          null)
+        }
+
+        { swapHubTransition((style, modal) =>
+          modal ?
+            <animated.div
+            style={style}
+            className='multiselect-modal-outer'
+            onClick={() => setSwapHubModal(false)}
+            >
+              <SwapHubModal/>
+            </animated.div>
+          :
+          null)
+        }
+
+        { cellArray }
       </div>
     </ClickContext.Provider>
   );

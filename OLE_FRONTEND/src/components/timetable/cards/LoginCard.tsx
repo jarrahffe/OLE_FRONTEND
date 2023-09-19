@@ -6,6 +6,9 @@ import LockIcon from '@mui/icons-material/Lock';
 import { animated, useSpring } from '@react-spring/web';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { login, register } from '../../../helpers/RequestHelpers';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 
 type Props = {
   loginModalActive: boolean
@@ -21,6 +24,7 @@ const LoginCard = (props: Props) => {
   const [confirmPassword, setConfirmPassword] = React.useState("")
   const [samePassword, setSamePassword] = React.useState(true);
   const [email, setEmail] = React.useState("");
+  const [rememberMe, setRememberMe] = React.useState(false);
 
   const [loginButtonSprings, loginButtonApi] = useSpring(() => ({
     from: {
@@ -109,7 +113,7 @@ const LoginCard = (props: Props) => {
     const error = (response: number) => {
       alert(`Could not log in: ${response}`)
     }
-    login(email, password, error);
+    login(email, password, error, rememberMe);
   }
 
 
@@ -161,6 +165,9 @@ const LoginCard = (props: Props) => {
           }}
           variant="outlined"
           onChange={e => setEmail(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === "Enter") handleLoginSubmit()
+          }}
           />
 
           <TextField
@@ -187,10 +194,19 @@ const LoginCard = (props: Props) => {
           }}
           variant="outlined"
           onChange={e => setPassword(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === "Enter") handleLoginSubmit()
+          }}
           />
 
           <div className="login-card-forgot-password">
-            <Typography sx={{position: "absolute", right: "0%", cursor: "pointer"}}>Forgot password?</Typography>
+            <Typography>Forgot password?</Typography>
+          </div>
+
+          <div className="login-card-remember-me">
+            <FormGroup>
+              <FormControlLabel control={<Checkbox size='small' checked={rememberMe} onClick={() => setRememberMe(!rememberMe)}/>} label="Remember me" />
+            </FormGroup>
           </div>
 
         </div>
@@ -243,6 +259,9 @@ const LoginCard = (props: Props) => {
             label="First Name"
             fullWidth
             onChange={e => setFirstName(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === "Enter") handleRegisterSubmit()
+            }}
             />
 
             <br/>
@@ -254,6 +273,9 @@ const LoginCard = (props: Props) => {
             label="Last Name"
             fullWidth
             onChange={e => setLastName(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === "Enter") handleRegisterSubmit()
+            }}
             />
           </Box>
 
@@ -271,6 +293,9 @@ const LoginCard = (props: Props) => {
             ),
           }}
           onChange={e => setEmail(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === "Enter") handleRegisterSubmit()
+          }}
           />
 
           <br/>
@@ -299,6 +324,9 @@ const LoginCard = (props: Props) => {
             </InputAdornment>
             )
           }}
+          onKeyDown={e => {
+            if (e.key === "Enter") handleRegisterSubmit()
+          }}
           />
 
           <br/>
@@ -316,6 +344,9 @@ const LoginCard = (props: Props) => {
                 <LockIcon/>
               </InputAdornment>
             )
+          }}
+          onKeyDown={e => {
+            if (e.key === "Enter") handleRegisterSubmit()
           }}
           />
         </div>

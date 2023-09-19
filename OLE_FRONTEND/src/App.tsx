@@ -1,5 +1,6 @@
 import './App.css';
 import './index.css';
+import './components/timetable/Swap.css';
 import Timetable from './components/timetable/Timetable';
 import NavBar from './components/nav/NavBar';
 import './components/timetable/Timetable.css';
@@ -10,12 +11,12 @@ import React from 'react';
 import axios from 'axios';
 import Theme from './Theme';
 import { CircularProgress } from '@mui/material';
-import moment from 'moment';
-import { DateMapContext, MultiSelectContext, WeekContext, UserInfoContext } from './contexts';
+import { DateMapContext, MultiSelectContext, WeekContext, UserInfoContext, SwapContext } from './contexts';
 import { mapDaysToDate } from './helpers/DateHelpers';
 import { Activity } from './config/activity';
 import { animated, useTransition } from '@react-spring/web';
 import LoginCard from './components/timetable/cards/LoginCard';
+import { CURRENT_WEEK } from './config/CurrentWeek';
 
 function App() {
 
@@ -23,7 +24,7 @@ function App() {
   const [loaded, setLoaded] = React.useState(false);
 
   // Currently selected week
-  const [selectedWeek, setSelectedWeek] = React.useState(moment().diff(moment("2023-07-17", "YYYY-MM-DD"), "weeks") + 1);
+  const [selectedWeek, setSelectedWeek] = React.useState(CURRENT_WEEK);
 
   // Map of days -> date
   const [dateMap, setDateMap] = React.useState(mapDaysToDate(0));
@@ -41,6 +42,12 @@ function App() {
   // Modal for multi select activities
   const [multiSelectModal, setMultiSelectModal] = React.useState(false);
 
+  // Modal for swap menu
+  const [swapMenuModal, setSwapMenuModal] = React.useState(false);
+
+  // Modal for incoming and outgoing swap menu
+  const [swapHubModal, setSwapHubModal] = React.useState(false);
+
   // Modal for logging in
   const [loginModalActive, setLoginModalActive] = React.useState(false);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
@@ -50,6 +57,8 @@ function App() {
   const [lastName, setLastName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [token, setToken] = React.useState("");
+  const [account, setAccount] = React.useState(-1);
+  const [isSuperUser, setIsSuperUser] = React.useState(false);
 
   React.useEffect(() => {
     setLoaded(false);
@@ -58,16 +67,21 @@ function App() {
       sessionStorage.setItem("data", JSON.stringify(response.data));
       setLoaded(true);
     }).catch(function(error) {
-      setLoaded(true)
+      setLoaded(true);
       console.log(error);
     });
     if (window.localStorage.getItem("user")) {
       const userInfo = JSON.parse(window.localStorage.getItem("user") as string)
-      setFirstName(userInfo.first_name)
-      setLastName(userInfo.last_name)
-      setEmail(userInfo.email)
-      setToken(userInfo.token)
-      setIsLoggedIn(true)
+      setFirstName((userInfo.first_name as string).charAt(0).toUpperCase() + (userInfo.first_name as string).slice(1));
+      setLastName(userInfo.last_name);
+      setEmail(userInfo.email);
+      setToken(userInfo.token);
+      setAccount(userInfo.account);
+      setIsSuperUser(userInfo.is_superuser);
+      setIsLoggedIn(true);
+      if (userInfo.rememberMe === false) {
+        window.localStorage.removeItem("user");
+      }
     }
   }, []);
 
@@ -95,34 +109,36 @@ function App() {
       <WeekContext.Provider value={{selectedWeek, setSelectedWeek}}>
         <MultiSelectContext.Provider value={{blockSelect, setBlockSelect, eventSelect, setEventSelect,
           multiActivities, setMultiActivities, multiDelete, setMultiDelete, multiSelectModal, setMultiSelectModal}}>
-          <UserInfoContext.Provider value={{firstName, lastName, email, token}}>
-            <ThemeProvider theme={Theme}>
-              <div className="App">
+          <SwapContext.Provider value={{swapMenuModal, setSwapMenuModal, swapHubModal, setSwapHubModal}}>
+            <UserInfoContext.Provider value={{firstName, lastName, email, token, account, isSuperUser}}>
+              <ThemeProvider theme={Theme}>
+                <div className="App">
 
-                { loginModalTransition((style, loginModalActive) =>
-                  loginModalActive ?
-                    <animated.div
-                    style={style}
-                    className='login-card-outer'
-                    >
-                      <LoginCard
-                      loginModalActive={loginModalActive}
-                      setLoginModalActive={setLoginModalActive}
-                      />
-                    </animated.div>
-                  :
-                  null
-                  )
-                }
+                  { loginModalTransition((style, loginModalActive) =>
+                    loginModalActive ?
+                      <animated.div
+                      style={style}
+                      className='login-card-outer'
+                      >
+                        <LoginCard
+                        loginModalActive={loginModalActive}
+                        setLoginModalActive={setLoginModalActive}
+                        />
+                      </animated.div>
+                    :
+                    null
+                    )
+                  }
 
-                <NavBar
-                isLoggedIn={isLoggedIn}
-                setLoginModalActive={setLoginModalActive}/>
+                  <NavBar
+                  isLoggedIn={isLoggedIn}
+                  setLoginModalActive={setLoginModalActive}/>
 
-                { loaded ? <Timetable /> : <CircularProgress/> }
-              </div>
-            </ThemeProvider>
-          </UserInfoContext.Provider>
+                  { loaded ? <Timetable /> : <CircularProgress/> }
+                </div>
+              </ThemeProvider>
+            </UserInfoContext.Provider>
+          </SwapContext.Provider>
         </MultiSelectContext.Provider>
       </WeekContext.Provider>
     </DateMapContext.Provider>
