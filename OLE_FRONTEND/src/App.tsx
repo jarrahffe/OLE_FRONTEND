@@ -132,7 +132,8 @@ function App() {
 
                   <NavBar
                   isLoggedIn={isLoggedIn}
-                  setLoginModalActive={setLoginModalActive}/>
+                  setLoginModalActive={setLoginModalActive}
+                  />
 
                   { loaded ? <Timetable /> : <CircularProgress/> }
                 </div>

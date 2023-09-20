@@ -22,7 +22,8 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('timetable/', include('timetable.urls')),
 
-    path('users/', include('accounts.urls')),
+    path('accounts/', include('accounts.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
     path('get-token/', obtain_auth_token),
 
 ]

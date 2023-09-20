@@ -1,3 +1,4 @@
+import { SwapRequest } from "../config/SwapRequest";
 import { Activity } from "../config/activity";
 import axios from "axios";
 
@@ -125,6 +126,30 @@ async function deleteActivity(id: string, token: string) {
       id: id
     }
   });
+}
+
+function createSwapRequest(id1: string, id2: string) {
+  let swapData: SwapRequest[] = JSON.parse(window.sessionStorage.getItem("swaps") as string);
+
+  axios.post(`${import.meta.env.VITE_BE_API_DELETE_ACTIVITY}`, {
+    activity_1_id: id1,
+    activity_2_id: id2
+  }).then(response => {
+    const newRequest: SwapRequest = {
+      
+    }
+  })
+  window.sessionStorage.setItem("swaps", JSON.stringify(swapData));
+}
+
+function acceptSwapRequest(id: string) {
+  let swapData: SwapRequest[] = JSON.parse(window.sessionStorage.getItem("swaps") as string);
+  window.sessionStorage.setItem("swaps", JSON.stringify(swapData));
+}
+
+function cancelSwapRequest(id: string) {
+  let swapData: SwapRequest[] = JSON.parse(window.sessionStorage.getItem("swaps") as string);
+  window.sessionStorage.setItem("swaps", JSON.stringify(swapData));
 }
 
 function sleep(ms: number) {

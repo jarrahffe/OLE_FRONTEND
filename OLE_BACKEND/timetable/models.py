@@ -3,8 +3,7 @@ from django.db import models
 from django.db.models import JSONField
 from django.contrib.auth import get_user_model
 
-# Create your models here.
-
+#Not migrated yet
 class Event(models.Model):
     name = models.CharField(max_length=120, default=None)
     notes = models.CharField(max_length=320, default=None, blank=True)
@@ -28,14 +27,11 @@ class Activity(models.Model):
     
 
 class Swap_request(models.Model):
-    # description = models.CharField(max_length=120, default=None)
-    # changes = JSONField(default=None)
-    # approved = models.IntegerField(default=None)
-    # created_by = models.ForeignKey(get_user_model(), default=None, on_delete=models.CASCADE, blank=True)
-
 
     activity_1 = models.ForeignKey(Activity, default=None, on_delete=models.CASCADE, related_name="swap_request_sender")
     activity_2 = models.ForeignKey(Activity, default=None, on_delete=models.CASCADE, related_name="swap_request_receiver")
+    description = models.CharField(max_length=120, default=None, null=True)
+
 
     def __str__(self):
         return self.activity_1.name + "<->" + self.activity_2.name

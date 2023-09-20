@@ -17,4 +17,4 @@ class SwapRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Swap_request
 
-        fields = ["id", "activity_1", "activity_2"]
+        fields = ["id", "activity_1", "activity_2", "state"]

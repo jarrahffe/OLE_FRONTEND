@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractUser
 
 
 class MyAccountManager(BaseUserManager):
@@ -46,13 +47,12 @@ class MyAccountManager(BaseUserManager):
 
 class Account(AbstractBaseUser, PermissionsMixin):
     class Meta:
-        db_table = "users_account"
+        db_table = "accounts_account"
 
         
     email           = models.EmailField(verbose_name='email', unique=True)
     first_name      = models.CharField(max_length=120, verbose_name='first_name', unique=True)
     last_name       = models.CharField(max_length=120, verbose_name='last_name', unique=True)
-    # username        = models.CharField(max_length=150, unique=True, blank=True, null=True)
 
     is_admin        = models.BooleanField(default=False)
     is_active       = models.BooleanField(default=True)
@@ -72,8 +72,6 @@ class Account(AbstractBaseUser, PermissionsMixin):
     
     def has_module_label(self, app_label):
         return True
-
-
 
 
 

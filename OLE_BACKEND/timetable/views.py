@@ -17,6 +17,7 @@ from .serializers import ActivitySerializer, SwapRequestSerializer
 # from django.contrib.auth.models import User
 from django.db import models
 import datetime
+from django.db.models import Q
 
 
 
@@ -29,6 +30,8 @@ def display_timetable(request):
     activities = Activity.objects
     serialised = ActivitySerializer(activities, many=True)
 
+    # swap_requests = Swap_request.objects.all()
+    # serialised = SwapRequestSerializer(swap_requests, many=True)
     return Response(serialised.data)
 
 
@@ -113,13 +116,11 @@ def delete_activity(request):
         return Response(status=status.HTTP_404_NOT_FOUND)
     
     #check Activity belongs to account that's querying
-    Account = get_user_model()
-    acc = Account.objects.all()[0]
-
     account = request.user
-    if account != activity.account and not acc.is_superuser:
+    if account != activity.account:
         return Response({'response': "You don't have permission to delete this"}, status=401)
     
+    #send email 
     email_TO = activity.account.email
     start_time = activity.start_time
     activity.delete()
@@ -177,14 +178,12 @@ def create_swap_request(request):
 
     activity_1 = Activity.objects.get(pk=data['activity_1'])
     activity_2 = Activity.objects.get(pk=data['activity_2'])
-    print(activity_1.name, activity_2.name)
     
     if activity_1.account != request.user:
         return Response({"response": "you don't have permission to request this swap"})
 
-
-
-    swap_request = Swap_request(activity_1=activity_1, activity_2=activity_2)
+    desc = '[Lesson Swap]: ' + activity_1.name + '<--->' + activity_2.name
+    swap_request = Swap_request(activity_1=activity_1, activity_2=activity_2, description=desc)
     serializer = SwapRequestSerializer(swap_request, data)
     print(serializer)
     if serializer.is_valid():
@@ -196,7 +195,7 @@ def create_swap_request(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def accept_swap_request(request):
-    swap_request = Swap_request.objects.get(pk=request.data['id'])  
+    swap_request = Swap_request.objects.get(pk=request.query_params['id'])  
     activity_1 = swap_request.activity_1
     activity_2 = swap_request.activity_2
 
@@ -221,31 +220,60 @@ def accept_swap_request(request):
     activity_1.save()
     activity_2.save()
 
-    swap_request.delete()
+
+    ### find all foreign keys of activity_1 and activity_2 and change state to cancelled ###
+    all_activity_1_swaps = Swap_request.objects.filter(activity_1=activity_1)
+    for swap in all_activity_1_swaps:
+        swap.delete()
+    
+    all_activity_2_swaps = Swap_request.objects.filter(activity_2=activity_2)
+    for swap in all_activity_2_swaps:
+        swap.delete()
+
+    #send email notifying swap
+    title = 'NO REPLY - Lesson swap confirmation'
+    email_TO_1 = activity_1.account.email
+    message_1 = "Hi {}, \n\n This is a friendly message confirming your lesson time swap from: {}:00 --> {}:00 on the {}".format(activity_1.name, str(activity_2.start_time), str(activity_1.start_time), activity_2.date)
+
+    email_TO_2 = activity_2.account.email
+    message_2 = "Hi {}, \n\n This is a friendly message confirming your lesson time swap from: {}:00 --> {}:00 on the {}".format(activity_2.name, str(activity_1.start_time), str(activity_2.start_time), activity_1.date)
+
+
+    send_mail(
+        title,
+        message_1,
+        'settings.EMAIL_HOST_USER',
+        [email_TO_1],
+        fail_silently=False
+    )
+    send_mail(
+        title,
+        message_2,
+        'settings.EMAIL_HOST_USER',
+        [email_TO_2],
+        fail_silently=False
+    )
+    
 
     return Response({"response": "successfully swapped {} <-> {}".format(activity_1, activity_2)})
 
 
 
-# @api_view(['GET']) 
-# @permission_classes([IsAuthenticated])
-# def accept_swap_request(request):
-#     swap_request = Swap_request.objects.get(id=request.data['id'])
-#     swap_request.approved += 1
-#     swap_request.save()
 
-#     #perform swap
-#     if swap_request.approved == len(swap_request.changes):
-        
-#         changes_dic = swap_request.changes
-#         for k, v in changes_dic.items():
-#             activity = Activity.objects.get(pk=int(k))
-#             print(activity.name, k, v)
+##### Remove Swap request ####
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def cancel_swap_request(request):
+    #check for permissions
+    #get swap request object
+    data = request.data
+    try:
+        swap_request = Swap_request.objects.get(pk=data['id'])
 
-#             activity.start_time = int(v['start_time'])
-#             activity.date = v['date']
-#             activity.day = v['day']
-#             activity.save()
+    except  Swap_request.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
     
-#     serializer = SwapRequestSerializer(swap_request)
-#     return Response(serializer.data)
+    swap_request.delete()
+
+    return Response({'response': 'Successfully cancelled swap request'})
+

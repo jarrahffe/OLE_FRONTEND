@@ -27,8 +27,8 @@ const SwapMenuModal = (props: Props) => {
       return `${moment((activity as Activity).date).format("ddd Do MMM")}, ${(activity as Activity).start_time > 12 ? (activity as Activity).start_time % 12 : (activity as Activity).start_time}${(activity as Activity).start_time > 11 ? "pm" : "am"}`;
   }
 
-  function handleActivityClick() {
-
+  function handleConfirm() {
+    
   }
 
   return (
@@ -73,7 +73,7 @@ const SwapMenuModal = (props: Props) => {
             Cancel
           </Button>
 
-          <Button variant='contained' color='info' onClick={() => null}>
+          <Button variant='contained' color='info' onClick={() => handleConfirm()}>
             Confirm
           </Button>
         </div>
