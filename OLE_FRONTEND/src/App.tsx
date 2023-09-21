@@ -15,10 +15,11 @@ import { DateMapContext, MultiSelectContext, WeekContext, UserInfoContext, SwapC
 import { mapDaysToDate } from './helpers/DateHelpers';
 import { Activity } from './config/activity';
 import { animated, useTransition } from '@react-spring/web';
-import LoginCard from './components/timetable/cards/LoginCard';
+import LoginCard from './components/timetable/Auth/LoginCard';
 import { CURRENT_WEEK } from './config/CurrentWeek';
 
 function App() {
+
 
   // App is loaded
   const [loaded, setLoaded] = React.useState(false);
@@ -48,6 +49,8 @@ function App() {
   // Modal for incoming and outgoing swap menu
   const [swapHubModal, setSwapHubModal] = React.useState(false);
 
+  const [swapNotifications, setSwapNotifications] = React.useState();
+
   // Modal for logging in
   const [loginModalActive, setLoginModalActive] = React.useState(false);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
@@ -64,7 +67,8 @@ function App() {
     setLoaded(false);
     axios.get(`${import.meta.env.VITE_BE_API_TIMETABLE}`, {
     }).then(response => {
-      sessionStorage.setItem("data", JSON.stringify(response.data));
+      sessionStorage.setItem("data", JSON.stringify(response.data.activities));
+      sessionStorage.setItem("swaps", JSON.stringify(response.data.swaps));
       setLoaded(true);
     }).catch(function(error) {
       setLoaded(true);

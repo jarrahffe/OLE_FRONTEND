@@ -1,16 +1,32 @@
 .swapmodal-inner {
   width: 40%;
-  height: 80%;
+  height: 90%;
   background-color: #eceff1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
   justify-content: space-evenly;
   border-radius: 0.5rem;
 }
 
+.swapmodal-inner-title {
+  position: relative;
+}
+
+.swapmodal-inner-title::after {
+  content: ''; /* Required for pseudo-elements to be visible */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px; /* Adjust the height to control the thickness of the underline */
+  background-image: linear-gradient(90deg, rgba(38,166,154,1) 0%, rgba(21,101,192,1) 100%);
+}
+
 .swapmodal-inner-content {
   width: 80%;
+  outline: solid rgba(128, 128, 128, 0.5) 0.5px;
   background-color: white;
   border-radius: 0.5rem;
   display: flex;
@@ -29,12 +45,13 @@
 
 .swapmodal-inner-content-lessons-items {
   overflow-y: scroll;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   height: 65%;
   align-items: center;
   position: relative;
-  top: 19%
+  top: 20.8%
 }
 
 .swapmodal-inner-content-swaphub {
@@ -54,7 +71,17 @@
   position: relative;
   align-content: center;
   justify-content: space-evenly;
-  height: 75%;
+  height: 50%;
+}
+
+.swaphubmodal-inner-content-cancelled {
+  width: 100%;
+  border-radius: 0.5rem;
+  display: flex;
+  position: relative;
+  align-content: center;
+  justify-content: space-evenly;
+  height: 25%;
 }
 
 .swaphubmodal-inner-content-box {
@@ -68,6 +95,7 @@
 
   background-color: white;
   border-radius: 0.5rem;
+  outline: solid rgba(128, 128, 128, 0.5) 0.5px;
 }
 
 .swaphubmodal-inner-content-items {
@@ -84,7 +112,7 @@
 
 .swaphubmodal-item {
   width: 100%;
-  height: 15%;
+  height: 20%;
   position: relative;
 
   display: flex;
@@ -97,4 +125,11 @@
   cursor: pointer;
   border-radius: 0.25rem;
   margin: 0.5rem;
+}
+
+.swaphubmodal-item-actions {
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
 }

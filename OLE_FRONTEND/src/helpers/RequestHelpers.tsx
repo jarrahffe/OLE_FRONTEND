@@ -1,6 +1,6 @@
-import { SwapRequest } from "../config/SwapRequest";
 import { Activity } from "../config/activity";
 import axios from "axios";
+import { sleep } from "./Sleep";
 
 export type RequestActivity = {
   id?: string
@@ -114,6 +114,8 @@ function login(email: string, password: string, error: Function, rememberMe: boo
 
 async function deleteActivity(id: string, token: string) {
 
+  console.log(id)
+
   let storageData: Activity[] = JSON.parse(window.sessionStorage.getItem("data") as string);
   storageData = storageData.filter(o => o.id !== id);
   window.sessionStorage.setItem("data", JSON.stringify(storageData));
@@ -127,34 +129,5 @@ async function deleteActivity(id: string, token: string) {
     }
   });
 }
-
-function createSwapRequest(id1: string, id2: string) {
-  let swapData: SwapRequest[] = JSON.parse(window.sessionStorage.getItem("swaps") as string);
-
-  axios.post(`${import.meta.env.VITE_BE_API_DELETE_ACTIVITY}`, {
-    activity_1_id: id1,
-    activity_2_id: id2
-  }).then(response => {
-    const newRequest: SwapRequest = {
-      
-    }
-  })
-  window.sessionStorage.setItem("swaps", JSON.stringify(swapData));
-}
-
-function acceptSwapRequest(id: string) {
-  let swapData: SwapRequest[] = JSON.parse(window.sessionStorage.getItem("swaps") as string);
-  window.sessionStorage.setItem("swaps", JSON.stringify(swapData));
-}
-
-function cancelSwapRequest(id: string) {
-  let swapData: SwapRequest[] = JSON.parse(window.sessionStorage.getItem("swaps") as string);
-  window.sessionStorage.setItem("swaps", JSON.stringify(swapData));
-}
-
-function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 
 export { bookRequest, blockRequest, register, login, deleteActivity }

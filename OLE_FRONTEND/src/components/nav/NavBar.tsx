@@ -5,7 +5,7 @@ import moment from 'moment';
 import { DateMapContext, MultiSelectContext, SwapContext, UserInfoContext, WeekContext } from '../../contexts';
 import { mapDaysToDate } from '../../helpers/DateHelpers';
 import { Activity } from '../../config/activity';
-import ProfileMenu from './ProfileMenu';
+import ProfileDropdown from './ProfileDropdown';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import usyd_logo from '../../assets/usyd_logo.png'
@@ -27,7 +27,7 @@ const NavBar = (props: Props) => {
   const HEADER_DIST_FROM_SIDE = isMobile ? "0%" : "2.5%";
 
   const CURRENT_WEEK = moment().diff(moment("2023-08-07", "YYYY-MM-DD"), "weeks") + 1;
-  const NUM_WEEKS_TOTAL = 13;
+  const NUM_WEEKS_TOTAL = 14;
 
   const { selectedWeek, setSelectedWeek } = React.useContext(WeekContext);
   const { dateMap, setDateMap } = React.useContext(DateMapContext);
@@ -44,7 +44,7 @@ const NavBar = (props: Props) => {
   const { swapHubModal, setSwapHubModal } = React.useContext(SwapContext);
 
   function handleSliderChange(val: number) {
-    if (val > 13 || val < 1) return
+    if (val > 14 || val < 1) return
     setSelectedWeek(val);
     setDateMap(mapDaysToDate(val - CURRENT_WEEK));
   }
@@ -166,7 +166,7 @@ const NavBar = (props: Props) => {
         props.isLoggedIn ?
         <Box sx={{position: "absolute", right: "8%"}}>
             <Tooltip title="Swaps">
-              <IconButton onClick={() => setSwapHubModal(true)} size='large'>
+              <IconButton onClick={() => setSwapHubModal(!swapHubModal)} size='large'>
                 <SwapHorizIcon fontSize='large' htmlColor='gray'/>
               </IconButton>
             </Tooltip>
@@ -183,7 +183,7 @@ const NavBar = (props: Props) => {
       }}>
         {
           props.isLoggedIn ?
-            <ProfileMenu/>
+            <ProfileDropdown/>
             :
             <Button
             variant="contained"

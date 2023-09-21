@@ -102,7 +102,12 @@ const LoginCard = (props: Props) => {
         alert("fill fields");
         return;
       }
-    register(firstName, lastName, email, password);
+
+    register(normaliseName(firstName), normaliseName(lastName), email, password);
+  }
+
+  function normaliseName(name: string) {
+    return name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
   }
 
   async function handleLoginSubmit() {

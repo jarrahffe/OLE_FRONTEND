@@ -1,15 +1,15 @@
 import React from 'react';
-import ActivitySelection from './cards/ActivitySelection';
-import ActivitySelectionPlaceholder from './cards/ActivitySelectionPlaceholder';
+import ActivitySelection from './ActivitySelection';
+import ActivitySelectionPlaceholder from './ActivitySelectionPlaceholder';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import moment from 'moment';
-import { Activity, makeActivity } from '../../config/activity';
-import { ClickContext, TimeCardContext, DayCardContext, WeekContext, MultiSelectContext, DateMapContext, UserInfoContext, SwapContext } from '../../contexts';
+import { Activity, makeActivity } from '../../../config/activity';
+import { ClickContext, TimeCardContext, DayCardContext, WeekContext, MultiSelectContext, DateMapContext, UserInfoContext, SwapContext } from '../../../contexts';
 import { animated, useSpring, useTransition } from '@react-spring/web';
 import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
-import { deleteActivity } from '../../helpers/RequestHelpers';
-import { CURRENT_WEEK } from '../../config/CurrentWeek';
+import { deleteActivity } from '../../../helpers/RequestHelpers';
+import { CURRENT_WEEK } from '../../../config/CurrentWeek';
 
 const BLOCK_NAME = "block";
 
@@ -52,7 +52,13 @@ const GridCell = (props: Props) => {
   const deleteOpen = Boolean(deleteAnchorEl);
   const swapOpen = Boolean(swapAnchorEl);
   const hasExpired = moment().isAfter(moment(`${gridCellDate}-${props.time}`, "YYYY-MM-DD-kk"));
-  const isTwoWeeksInAdvance = selectedWeek - CURRENT_WEEK > 1;
+  const isGtOneWeekInAdvance = selectedWeek - CURRENT_WEEK > 1;
+  const isOneWeekInAdvanceNotThursday = selectedWeek - CURRENT_WEEK === 1 && moment().weekday() < 4;
+
+  let invalidBookMessage = "";
+  if (hasExpired) invalidBookMessage = "Time is in the past!";
+  else if (isGtOneWeekInAdvance) invalidBookMessage = `Time is ${selectedWeek - CURRENT_WEEK} weeks ahead!`;
+  else if (isOneWeekInAdvanceNotThursday) invalidBookMessage = "Please wait until thursday to book!";
 
   const map = new Map();
   map.set("lesson", "#1565c0");
@@ -175,7 +181,7 @@ const GridCell = (props: Props) => {
   }
 
   function isAfterCurrentDate() {
-    return moment(gridCellDate).isAfter(moment());
+    return moment(`${gridCellDate}-${props.time}`, "YYYY-MM-DD-HH").isAfter(moment())
   }
 
   function createSwapRequest() {
@@ -201,7 +207,7 @@ const GridCell = (props: Props) => {
           :
             <div className="grid-cell-activity" style={{ backgroundColor: map.get(activity.type), opacity: hasExpired ? "25%" : opacity}} >
               {
-                dayCard === props.day.toLowerCase().slice(0, 3) && timeCard === time && !blockSelect && !eventSelect && (props.activity?.account === account || isSuperUser) && !hasExpired ?
+                dayCard === props.day.toLowerCase().slice(0, 3) && timeCard === time && !blockSelect && !eventSelect && (props.activity?.account === account || isSuperUser) && token && !hasExpired ?
                   <Tooltip title="Delete">
                     <IconButton onClick={handleDeleteMenuClick} sx={{position: "absolute", right: "5%"}}><DeleteIcon htmlColor='lightgray'/></IconButton>
                   </Tooltip>
@@ -330,13 +336,13 @@ const GridCell = (props: Props) => {
       disableFocusListener
       disableHoverListener
       disableTouchListener
-      title={hasExpired ? "Time is in the past!" : "Time is more than one week ahead!"}
+      title={invalidBookMessage}
       >
 
         <div className="grid-cell-blank"
         onMouseEnter={() => handleEnter()}
         onMouseDown={() => {
-          if (hasExpired || isTwoWeeksInAdvance) {
+          if (hasExpired || (isGtOneWeekInAdvance && !isSuperUser) || (isOneWeekInAdvanceNotThursday && !isSuperUser)) {
             setPastTimeTooltip(true);
             setTimeout(() => {
               setPastTimeTooltip(false);

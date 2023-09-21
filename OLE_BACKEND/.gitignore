@@ -1,9 +1,0 @@
-db.sqlite3
-
-timetable/__pycache__
-
-timetable/migrations/__pycache__
-
-accounts/__pycache__
-
-ole/__pycache__

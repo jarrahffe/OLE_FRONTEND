@@ -1,12 +1,12 @@
 import React from 'react';
-import { Activity } from '../../config/activity';
+import { Activity } from '../../../config/activity';
 import GridCell from './GridCell';
-import { ClickContext, DateMapContext, DayCardContext, MultiSelectContext, SwapContext, TimeCardContext, WeekContext } from '../../contexts';
-import MultiSelectModal from './cards/MultiSelectModal';
+import { ClickContext, DateMapContext, DayCardContext, MultiSelectContext, SwapContext, TimeCardContext, WeekContext } from '../../../contexts';
+import MultiSelectModal from '../Modals/MultiSelectModal';
 import { animated, useTransition } from '@react-spring/web';
-import SwapMenuModal from './cards/SwapMenuModal';
+import SwapMenuModal from '../Modals/SwapMenuModal';
 import moment from 'moment';
-import SwapHubModal from './cards/SwapHubModal';
+import SwapHubModal from '../Modals/SwapHubModal';
 
 const TimeGrid = () => {
 
