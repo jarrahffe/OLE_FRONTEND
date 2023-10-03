@@ -13,31 +13,25 @@ const MultiSelectModal = () => {
   const { token } = React.useContext(UserInfoContext);
 
   async function handleConfirm() {
-    if (eventSelect) {
-      if (multiActivities) {
-        for (const activity of (multiActivities as Map<Activity, Function>).keys()) {
-          const reqActivity: RequestActivity = activity;
-          reqActivity.name = eventName;
-          delete reqActivity.id;
-          const status: Array<number> = [];
-          bookRequest(reqActivity, status, token);
-        }
+    if (eventSelect && multiActivities) {
+      for (const activity of (multiActivities as Map<Activity, Function>).keys()) {
+        const reqActivity: RequestActivity = activity;
+        reqActivity.name = eventName;
+        delete reqActivity.id;
+        const status: Array<number> = [];
+        bookRequest(reqActivity, status, token);
       }
     }
-    else {
+    else if (blockSelect && multiActivities) {
       const blockActivities: RequestActivity[] = [];
-      const status: Array<number> = [];
 
-      if (multiActivities) {
-        for (const activity of (multiActivities as Map<Activity, Function>).keys()) {
-          const reqActivity: RequestActivity = activity;
-          delete reqActivity.id;
-          delete reqActivity.name;
-          delete reqActivity.notes;
-          blockActivities.push(reqActivity);
-        }
-        blockRequest({activities: blockActivities}, status, token);
+      for (const activity of (multiActivities as Map<Activity, Function>).keys()) {
+        const reqActivity: RequestActivity = activity;
+        delete reqActivity.id;
+        delete reqActivity.notes;
+        blockActivities.push(reqActivity);
       }
+      blockRequest({activities: blockActivities}, token);
     }
     if (multiDelete) {
       for (const activity of (multiDelete as Map<Activity, Function>).keys()) {

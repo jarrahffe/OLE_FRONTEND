@@ -18,7 +18,7 @@ export type BlockTimes = {
   activities: RequestActivity[]
 }
 
-async function blockRequest(blockTimes: BlockTimes, status: Array<number>, token: string) {
+async function blockRequest(blockTimes: BlockTimes, token: string) {
   axios.post(`${import.meta.env.VITE_BE_API_BLOCK_TIMES}`, blockTimes,
     {
       headers: {
@@ -31,12 +31,10 @@ async function blockRequest(blockTimes: BlockTimes, status: Array<number>, token
         const storageData: Activity[] = JSON.parse(window.sessionStorage.getItem("data") as string);
 
         blockArr.forEach((activity) => {
-          delete activity.account;
           storageData.push(activity as Activity)
         })
 
         window.sessionStorage.setItem("data", JSON.stringify(storageData));
-        status[0] = response.status;
       }
     });
 }
