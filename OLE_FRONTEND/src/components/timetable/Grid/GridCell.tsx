@@ -3,6 +3,7 @@ import ActivitySelection from './ActivitySelection';
 import ActivitySelectionPlaceholder from './ActivitySelectionPlaceholder';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import LyricsRoundedIcon from '@mui/icons-material/LyricsRounded';
 import moment from 'moment';
 import { Activity, makeActivity } from '../../../config/activity';
 import { ClickContext, TimeCardContext, DayCardContext, WeekContext, MultiSelectContext, DateMapContext, UserInfoContext, SwapContext } from '../../../contexts';
@@ -10,6 +11,7 @@ import { animated, useSpring, useTransition } from '@react-spring/web';
 import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import { deleteActivity } from '../../../helpers/RequestHelpers';
 import { CURRENT_WEEK } from '../../../config/CurrentWeek';
+import StudioRadialMenu from './StudioRadialMenu';
 
 const BLOCK_NAME = "block";
 
@@ -32,7 +34,7 @@ const GridCell = (props: Props) => {
   const { dayCard, setDayCard } = React.useContext(DayCardContext);
   const { blockSelect, eventSelect, multiActivities, setMultiActivities, multiDelete, setMultiDelete } = React.useContext(MultiSelectContext);
   const { dateMap } = React.useContext(DateMapContext);
-  const { firstName, token, account, isSuperUser } = React.useContext(UserInfoContext);
+  const { firstName, lastName, token, account, isSuperUser } = React.useContext(UserInfoContext);
   const { setSwapMenuModal } = React.useContext(SwapContext);
 
   const gridCellDate = dateMap.get(props.day.slice(0, 3)) as string;
@@ -58,7 +60,7 @@ const GridCell = (props: Props) => {
   let invalidBookMessage = "";
   if (hasExpired) invalidBookMessage = "Time is in the past!";
   else if (isGtOneWeekInAdvance) invalidBookMessage = `Time is ${selectedWeek - CURRENT_WEEK} weeks ahead!`;
-  else if (isOneWeekInAdvanceNotThursday) invalidBookMessage = "Please wait until thursday to book!";
+  else if (isOneWeekInAdvanceNotThursday) invalidBookMessage = "Please wait until Thursday to book";
 
   const map = new Map();
   map.set("lesson", "#1565c0");
@@ -221,46 +223,46 @@ const GridCell = (props: Props) => {
                 onClose={handleDeleteClose}
                 onClick={handleDeleteClose}
                 sx={{
-                  elevation: 0,
-                  sx: {
-                    overflow: 'visible',
-                    filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                    mt: 1.5,
-                    '& .MuiAvatar-root': {
-                      width: 32,
-                      height: 32,
-                      ml: -0.5,
-                      mr: 1,
+                    elevation: 0,
+                    sx: {
+                      overflow: 'visible',
+                      filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                      mt: 1.5,
+                      '& .MuiAvatar-root': {
+                        width: 32,
+                        height: 32,
+                        ml: -0.5,
+                        mr: 1,
+                      },
+                      '&:before': {
+                        content: '""',
+                        display: 'block',
+                        position: 'absolute',
+                        top: 0,
+                        right: 14,
+                        width: 10,
+                        height: 10,
+                        bgcolor: 'background.paper',
+                        transform: 'translateY(-50%) rotate(45deg)',
+                        zIndex: 0,
+                      },
                     },
-                    '&:before': {
-                      content: '""',
-                      display: 'block',
-                      position: 'absolute',
-                      top: 0,
-                      right: 14,
-                      width: 10,
-                      height: 10,
-                      bgcolor: 'background.paper',
-                      transform: 'translateY(-50%) rotate(45deg)',
-                      zIndex: 0,
-                    },
-                  },
-                }}
-                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-              >
+                  }}
+                  transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                  anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                >
 
-                <MenuItem onClick={() => {
-                  deleteActivity(props.id, token);
-                  setActivity(undefined);
-                }}>
-                  Delete Activity
-                </MenuItem>
+                  <MenuItem onClick={() => {
+                    deleteActivity(props.id, token);
+                    setActivity(undefined);
+                  }}>
+                    Delete Activity
+                  </MenuItem>
 
               </Menu>
 
               {
-                 dayCard === props.day.toLowerCase().slice(0, 3) && timeCard === time && !blockSelect && !eventSelect && props.activity?.account !== account && token && isAfterCurrentDate() && !hasExpired && props.activity?.type === "lesson"?
+                dayCard === props.day.toLowerCase().slice(0, 3) && timeCard === time && !blockSelect && !eventSelect && props.activity?.account !== account && token && isAfterCurrentDate() && !hasExpired && props.activity?.type === "lesson"?
                   <Tooltip title="Swap">
                     <IconButton onClick={handleSwapMenuClick} sx={{position: "absolute", left: "5%"}}><SwapHorizIcon htmlColor='lightgray'/></IconButton>
                   </Tooltip>
@@ -309,6 +311,13 @@ const GridCell = (props: Props) => {
 
               </Menu>
 
+              {
+                activity.name.toLowerCase() === "studio" && dayCard === props.day.toLowerCase().slice(0, 3) && timeCard === time && !blockSelect && !eventSelect ?
+                <StudioRadialMenu/>
+                :
+                null
+              }
+
               <div className='grid-cell-name' style={{textDecoration: opacity !== "100%" ? "line-through" : "none"}}>
                 { activity.type !== BLOCK_NAME ?  <p>{activity.name}</p> : null }
               </div>
@@ -323,8 +332,8 @@ const GridCell = (props: Props) => {
                   null
               }
             </div>
-        }
-      </animated.div>
+          }
+        </animated.div>
     ) :
     (
       <Tooltip
@@ -348,9 +357,7 @@ const GridCell = (props: Props) => {
               setPastTimeTooltip(false);
             }, 1000);
           }
-          else if (clicked !== props.id) {
-            handleMouseDown()
-          }
+          else if (clicked !== props.id) handleMouseDown();
         }}
         onMouseLeave={() => handleLeave()}
         onMouseUp={() => beingDragged.current = false}
