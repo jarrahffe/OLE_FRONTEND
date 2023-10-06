@@ -362,7 +362,7 @@ const GridCell = (props: Props) => {
         //   }
         //   else if (clicked !== props.id) handleMouseDown();
         // }}
-        onMouseDown={() => handleMouseDown()}
+        onMouseDown={() => {if (clicked !== props.id) handleMouseDown()}}
         onMouseLeave={() => handleLeave()}
         onMouseUp={() => beingDragged.current = false}
         >
