@@ -130,19 +130,6 @@ const TimeGrid = () => {
           null)
         }
 
-        { swapMenuTransition((style, modal) =>
-          modal ?
-            <animated.div
-            style={style}
-            className='multiselect-modal-outer'
-            onClick={() => setSwapMenuModal(false)}
-            >
-              <SwapMenuModal swapped={swapped} setSwapped={setSwapped}/>
-            </animated.div>
-          :
-          null)
-        }
-
         { swapHubTransition((style, modal) =>
           modal ?
             <animated.div

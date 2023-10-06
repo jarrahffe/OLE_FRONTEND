@@ -327,6 +327,18 @@
   position: relative;
   height: 10%;
   width: 40%;
+  top: 7%;
+  border-radius: 0.25rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.register-card-register-button {
+  position: relative;
+  height: 10%;
+  width: 40%;
   top: 2%;
   border-radius: 0.25rem;
   display: flex;
@@ -355,6 +367,9 @@
 
 .login-card-create-account {
   height: fit-content;
+  position: relative;
+  top: 6%;
+  color: grey;
   display: flex;
   align-items: center;
   justify-content: center;

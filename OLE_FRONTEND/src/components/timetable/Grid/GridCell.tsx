@@ -42,7 +42,7 @@ const GridCell = (props: Props) => {
   // State
   const [activity, setActivity] = React.useState(props.activity);
   const [name, setName] = React.useState(firstName);
-  const [opacity, setOpacity] = React.useState("100%")
+  const [opacity, setOpacity] = React.useState("100%");
   const [deleteAnchorEl, setDeleteAnchorEl] = React.useState<null | HTMLElement>(null);
   const [swapAnchorEl, setSwapAnchorEl] = React.useState<null | HTMLElement>(null);
   const [pastTimeTooltip, setPastTimeTooltip] = React.useState(false);
@@ -122,8 +122,6 @@ const GridCell = (props: Props) => {
 
   // Set currently clicked cell
   function handleClick() {
-    if (hasExpired) return;
-
     if (blockSelect || eventSelect) {
 
       if (activity && multiActivities && multiActivities.has(activity)) {
@@ -269,6 +267,7 @@ const GridCell = (props: Props) => {
                 :
                 null
               }
+
               <Menu
                 anchorEl={swapAnchorEl}
                 id="account-menu"
@@ -304,11 +303,9 @@ const GridCell = (props: Props) => {
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
               >
-
                 <MenuItem onClick={() => createSwapRequest()}>
                   Create Swap Request
                 </MenuItem>
-
               </Menu>
 
               {
@@ -318,7 +315,12 @@ const GridCell = (props: Props) => {
                 null
               }
 
-              <div className='grid-cell-name' style={{textDecoration: opacity !== "100%" ? "line-through" : "none"}}>
+              <div className='grid-cell-name'
+              style={{
+                textDecoration: opacity !== "100%" ? "line-through" : "none",
+                color: activity.account === account && activity.type !== "special" ? "gold" : "white",
+                fontWeight: activity.account === account && activity.type !== "special" ? 1000 : 400
+              }}>
                 { activity.type !== BLOCK_NAME ?  <p>{activity.name}</p> : null }
               </div>
 
@@ -332,9 +334,10 @@ const GridCell = (props: Props) => {
                   null
               }
             </div>
-          }
-        </animated.div>
-    ) :
+        }
+      </animated.div>
+    )
+    :
     (
       <Tooltip
       PopperProps={{
@@ -350,15 +353,16 @@ const GridCell = (props: Props) => {
 
         <div className="grid-cell-blank"
         onMouseEnter={() => handleEnter()}
-        onMouseDown={() => {
-          if (hasExpired || (isGtOneWeekInAdvance && !isSuperUser) || (isOneWeekInAdvanceNotThursday && !isSuperUser)) {
-            setPastTimeTooltip(true);
-            setTimeout(() => {
-              setPastTimeTooltip(false);
-            }, 1000);
-          }
-          else if (clicked !== props.id) handleMouseDown();
-        }}
+        // onMouseDown={() => {
+        //   if (hasExpired || (isGtOneWeekInAdvance && !isSuperUser) || (isOneWeekInAdvanceNotThursday && !isSuperUser)) {
+        //     setPastTimeTooltip(true);
+        //     setTimeout(() => {
+        //       setPastTimeTooltip(false);
+        //     }, 1000);
+        //   }
+        //   else if (clicked !== props.id) handleMouseDown();
+        // }}
+        onMouseDown={() => handleMouseDown()}
         onMouseLeave={() => handleLeave()}
         onMouseUp={() => beingDragged.current = false}
         >

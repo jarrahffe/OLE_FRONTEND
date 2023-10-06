@@ -20,6 +20,7 @@
     "@react-spring/web": "^9.7.2",
     "@tippyjs/react": "^4.2.6",
     "axios": "^1.4.0",
+    "email-validator": "^2.0.4",
     "formik": "^2.2.9",
     "material-ui-popup-state": "^5.0.9",
     "moment": "^2.29.4",

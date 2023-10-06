@@ -1,6 +1,6 @@
 import React from 'react';
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, Button, FormControl, IconButton, Input, InputAdornment, InputLabel, TextField, Typography } from '@mui/material';
+import { Box, Button, FormControl, IconButton, Input, InputAdornment, InputLabel, TextField, Tooltip, Typography } from '@mui/material';
 import { AccountCircle, Visibility, VisibilityOff } from '@mui/icons-material';
 import LockIcon from '@mui/icons-material/Lock';
 import { animated, useSpring } from '@react-spring/web';
@@ -9,6 +9,7 @@ import { login, register } from '../../../helpers/RequestHelpers';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import * as EmailValidator from 'email-validator';
 
 type Props = {
   loginModalActive: boolean
@@ -44,6 +45,14 @@ const LoginCard = (props: Props) => {
     },
   }));
 
+  const [tooltipSprings, tooltipApi] = useSpring(() => ({
+    from: {
+      bottom: "0%",
+      opacity: "0%"
+    },
+  }));
+
+
   function handlePasswordInput(pass: string) {
     setPassword(pass);
     setSamePassword(pass.localeCompare(confirmPassword) === 0);
@@ -77,6 +86,7 @@ const LoginCard = (props: Props) => {
   }
 
   function handleSignUpClick() {
+    animateTooltipLeave();
     loginCardApi.start({
       from: {
         right: "0%"
@@ -95,15 +105,69 @@ const LoginCard = (props: Props) => {
     })
   }
 
-  async function handleRegisterSubmit() {
-    if (!samePassword || email.length === 0
-      || password.length === 0 || firstName.length === 0
-      || lastName.length === 0) {
-        alert("fill fields");
-        return;
+  function registerFieldsFilled() {
+    if ( !email || !password || !samePassword || !firstName || !lastName) {
+        return false;
       }
+    return true;
+  }
 
-    register(normaliseName(firstName), normaliseName(lastName), email, password);
+  function loginFieldsFilled() {
+    if (!email || !password) return false;
+    return true;
+  }
+
+  function getRegisterTooltipMessage() {
+    if (!registerFieldsFilled()) return "Please fill all fields";
+    else if (!EmailValidator.validate(email)) return "Please enter a valid email";
+    return "An account with this email already exists";
+  }
+
+  function getLoginTooltipMessage() {
+    if (!loginFieldsFilled()) return "Please fill all fields";
+    else if (!EmailValidator.validate(email)) return "Please enter a valid email";
+    return "There is no account with this email";
+  }
+
+  function setTooltipActive() {
+    animateTooltipEnter();
+    setTimeout(() => {
+      animateTooltipLeave();
+    }, 1750);
+  }
+
+  async function handleRegisterSubmit() {
+    if (!registerFieldsFilled() || !EmailValidator.validate(email)) {
+      setTooltipActive();
+      return;
+    }
+    register(normaliseName(firstName), normaliseName(lastName), email, password, setTooltipActive);
+  }
+
+  function animateTooltipEnter() {
+    tooltipApi({
+      from: {
+        bottom: "0%",
+        opacity: "0%"
+      },
+      to: {
+        bottom: "125%",
+        opacity: "100%"
+      }
+    });
+  }
+
+  function animateTooltipLeave() {
+    tooltipApi({
+      from: {
+        bottom: "125%",
+        opacity: "100%"
+      },
+      to: {
+        bottom: "0%",
+        opacity: "0%"
+      }
+    });
   }
 
   function normaliseName(name: string) {
@@ -111,18 +175,15 @@ const LoginCard = (props: Props) => {
   }
 
   async function handleLoginSubmit() {
-    if (email.length === 0 || password.length === 0) {
-        alert("fill fields");
-        return;
+    if (!email || !password || !EmailValidator.validate(email)) {
+      setTooltipActive();
+      return;
     }
-    const error = (response: number) => {
-      alert(`Could not log in: ${response}`)
-    }
-    login(email, password, error, rememberMe);
+    login(email, password, rememberMe, setTooltipActive);
   }
 
-
   function handleBackClick() {
+    animateTooltipLeave();
     loginCardApi.start({
       from: {
         right: "100%"
@@ -226,6 +287,12 @@ const LoginCard = (props: Props) => {
           <Typography sx={{fontSize: "1.25rem", color: "white"}}>
             Log In
           </Typography>
+
+          {
+            <animated.div style={{...tooltipSprings, position: "absolute", width: "300%", display: "flex", justifyContent: "center"}}>
+              <Typography sx={{fontSize: "1rem", color: "#b71c1c"}}>{getLoginTooltipMessage()}</Typography>
+            </animated.div>
+          }
         </animated.div>
 
         <br/>
@@ -250,7 +317,7 @@ const LoginCard = (props: Props) => {
 
         <div className='register-card-title'>
           <Typography sx={{ fontSize: "2rem", color: "black", }}>
-            NEW ACCOUNT
+            NEW STUDENT
           </Typography>
         </div>
 
@@ -356,18 +423,19 @@ const LoginCard = (props: Props) => {
           />
         </div>
 
-
         <animated.div
-        className="login-card-login-button"
+        className="register-card-register-button"
         onClick={() => handleRegisterSubmit()}
         onMouseEnter={() => handleLoginButtonEnter()}
         onMouseLeave={() => handleLoginButtonLeave()}
         style={{...loginButtonSprings}}>
-          <Typography sx={{fontSize: "1.25rem", color: "white"}}>
-            Register
-          </Typography>
+          {
+            <animated.div style={{...tooltipSprings, position: "absolute", width: "300%", display: "flex", justifyContent: "center"}}>
+              <Typography sx={{fontSize: "1rem", color: "#b71c1c"}}>{getRegisterTooltipMessage()}</Typography>
+            </animated.div>
+          }
+          <Typography sx={{fontSize: "1.25rem", color: "white"}}> Register </Typography>
         </animated.div>
-
 
       </animated.div>
     </>

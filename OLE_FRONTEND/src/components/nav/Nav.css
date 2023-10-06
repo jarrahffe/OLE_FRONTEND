@@ -6,3 +6,106 @@
     width: 300px;
     height: 100px;
 }
+
+.navbar-swap-menu {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  width: 23%;
+  height: 100%;
+  right: 14%;
+}
+
+.navbar-swap-menu-time {
+  width: 35%;
+  border-radius: 0.25rem;
+  height: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  position: absolute;
+  background-color: #1976d2;
+  z-index: 5;
+}
+
+.navbar-swap-menu-arrow {
+  width: 100%;
+  height: 40%;
+  background-color: rgb(255, 255, 255);
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrowhead-lower {
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+  position: absolute;
+  right: -7%;
+  top: 110%;
+  width: 13%;
+}
+
+.arrowhead-upper {
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  position: absolute;
+  bottom: 110%;
+  right: -7%;
+  width: 13%;
+}
+
+@property --gradient-angle{
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+:root {
+  --clr-1: #1976d2;
+  --clr-3: #ffc400;
+}
+
+@keyframes rotation {
+  0%   { --gradient-angle: 0deg; }
+  100% { --gradient-angle: 360deg; }
+}
+
+
+.navbar-arrow-glow {
+  width: 28%;
+  left: 35%;
+  position: absolute;
+  height: 20%;
+  top: calc(50% - 20%/2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: conic-gradient(
+    from var(--gradient-angle),
+    var(--clr-1),
+    var(--clr-3),
+    var(--clr-1),
+    var(--clr-3),
+    var(--clr-1)
+  );
+  animation: rotation 2s linear infinite;
+}
+
+.navbar-arrowhead-glow {
+  height: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: conic-gradient(
+    from var(--gradient-angle),
+    var(--clr-3),
+    var(--clr-1),
+    var(--clr-3),
+    var(--clr-1),
+    var(--clr-3)
+  );
+  animation: rotation 2s linear infinite;
+}

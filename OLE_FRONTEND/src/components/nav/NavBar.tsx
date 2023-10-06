@@ -41,7 +41,7 @@ const NavBar = (props: Props) => {
 
   const { isSuperUser } = React.useContext(UserInfoContext);
 
-  const { swapHubModal, setSwapHubModal } = React.useContext(SwapContext);
+  const { swapHubModal, setSwapHubModal, swapMenuModal, setSwapMenuModal } = React.useContext(SwapContext);
 
   function handleSliderChange(val: number) {
     if (val > 14 || val < 1) return
@@ -163,6 +163,27 @@ const NavBar = (props: Props) => {
       </Box>
 
       {
+        <div className='navbar-swap-menu'>
+
+          <div className='navbar-swap-menu-time' style={{left: "0%"}}>
+            <Typography sx={{fontWeight: 1000, color: "gold"}}>Fri 1pm</Typography>
+          </div>
+
+          <div className='navbar-arrow-glow'>
+            <div className='navbar-swap-menu-arrow'>
+              <div className='navbar-arrowhead-glow arrowhead-lower'/>
+              <div className='navbar-arrowhead-glow arrowhead-upper'/>
+            </div>
+          </div>
+
+          <div className='navbar-swap-menu-time' style={{right: "0%"}}>
+            <Typography sx={{fontWeight: 1000}}>Thurs 10am</Typography>
+          </div>
+
+        </div>
+      }
+
+      {
         props.isLoggedIn ?
         <Box sx={{position: "absolute", right: "8%"}}>
             <Tooltip title="Swaps">
@@ -174,6 +195,7 @@ const NavBar = (props: Props) => {
         :
         null
       }
+
       <Box sx={{
         position: "absolute",
         height: "100%",

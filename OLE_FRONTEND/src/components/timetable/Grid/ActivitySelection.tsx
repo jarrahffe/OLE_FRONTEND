@@ -21,9 +21,10 @@ const ActivitySelection = (props: Props) => {
   const { dateMap } = React.useContext(DateMapContext);
   const { selectedWeek } = React.useContext(WeekContext);
   const { token } = React.useContext(UserInfoContext)
+
   const [type, setType] = React.useState("lesson");
   const [bookProgress, setBookProgress] = React.useState(false);
-  const [notLoggedInTooltip, setNotLoggedInTooltip] = React.useState(false);
+  const [tooltipActive, setTooltipActive] = React.useState(false);
 
   // The actual name retrieved? from window cookies
   const { firstName } = React.useContext(UserInfoContext);
@@ -46,8 +47,7 @@ const ActivitySelection = (props: Props) => {
       week: selectedWeek,
     }
 
-    const status: Array<number> = [];
-    bookRequest(bookObj, status, token, setBookProgress, setClicked);
+    bookRequest(bookObj, token, setBookProgress, setClicked, setTooltipActive);
   }
 
   React.useEffect(() => {
@@ -56,12 +56,18 @@ const ActivitySelection = (props: Props) => {
 
   function handleSubmit() {
     if (props.name === "" || !token) {
-      setNotLoggedInTooltip(true);
+      setTooltipActive(true);
       setTimeout(() => {
-        setNotLoggedInTooltip(false);
+        setTooltipActive(false);
       }, 1000);
     }
     else handleBook();
+  }
+
+  function getTooltipMessage() {
+    if (!token) return "Please log in or become a student";
+    else if (props.name === "") return "Please enter your name";
+    else return "This time is already taken";
   }
 
   return (
@@ -71,8 +77,7 @@ const ActivitySelection = (props: Props) => {
         {props.time > 11 ? "pm" : "am"}
       </h4>
 
-      <div
-        className="activity-selection-close-button"
+      <div className="activity-selection-close-button"
         onClick={() => setClicked("")}
       >
         <CloseIcon fontSize='small' htmlColor='grey' />
@@ -101,12 +106,12 @@ const ActivitySelection = (props: Props) => {
           PopperProps={{
             disablePortal: true,
           }}
-          open={notLoggedInTooltip}
+          open={tooltipActive}
           placement='top'
           disableFocusListener
           disableHoverListener
           disableTouchListener
-          title={!token ? "Please log in or register!" : "Please input your name!" }
+          title={getTooltipMessage()}
         >
           <LoadingButton
             loading={bookProgress}

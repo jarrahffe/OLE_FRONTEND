@@ -39,28 +39,44 @@ async function blockRequest(blockTimes: BlockTimes, token: string) {
     });
 }
 
-async function bookRequest(activity: RequestActivity, status: Array<number>, token: string, setBookProgress: Function = () => {}, setClicked: Function = () => {}) {
+async function bookRequest(
+  activity: RequestActivity,
+  token: string, setBookProgress: Function = () => {},
+  setClicked: Function = () => {},
+  setTooltipActive: Function = () => {}
+  ) {
 
-  axios.post(`${import.meta.env.VITE_BE_API_ADD_ACTIVITY}`, activity,
+  axios.post(
+    `${import.meta.env.VITE_BE_API_ADD_ACTIVITY}`,
+    activity,
     {
       headers: {
         "Authorization": `Token ${token}`
       }
-    }).then(async function(response) {
+    }
+  ).then(async function(response) {
 
-      if (response.status === 200) {
-        const returnedObj: Activity = response.data;
+    let sleepTime = 750;
 
-        const storageData: Activity[] = JSON.parse(window.sessionStorage.getItem("data") as string);
-        storageData.push(returnedObj)
+    if (response.data[0] === "Error: this time has already taken") {
+      sleepTime += 1000;
+      setTooltipActive(true);
+      setTimeout(() => {
+        setTooltipActive(false);
+      }, sleepTime);
+    }
 
-        window.sessionStorage.setItem("data", JSON.stringify(storageData));
-        status[0] = response.status;
-      }
-      await sleep(750);
-      setBookProgress(false);
-      setClicked("");
-    });
+    else if (response.status === 200) {
+      const returnedObj: Activity = response.data;
+      const storageData: Activity[] = JSON.parse(window.sessionStorage.getItem("data") as string);
+      storageData.push(returnedObj)
+      window.sessionStorage.setItem("data", JSON.stringify(storageData));
+    }
+
+    await sleep(sleepTime);
+    setBookProgress(false);
+    setClicked("");
+  });
 }
 
 export type RegisterResponse = {
@@ -73,7 +89,13 @@ export type RegisterResponse = {
 }
 
 
-async function register(firstName: string, lastName: string, email: string, password: string) {
+async function register(
+firstName: string,
+lastName: string,
+email: string,
+password: string,
+setTooltipActive: Function) {
+
   const registerObj = {
     first_name: firstName,
     last_name: lastName,
@@ -82,14 +104,19 @@ async function register(firstName: string, lastName: string, email: string, pass
     password2: password
   }
   axios.post(`${import.meta.env.VITE_BE_API_REGISTER}`, registerObj).then(response => {
-    const res: RegisterResponse = response.data;
-    console.log(response.data);
-    window.localStorage.setItem("user", JSON.stringify(res));
-    location.reload()
+    console.log(response.data)
+    if (response.data.email[0] === "account with this email already exists.") {
+      setTooltipActive();
+    }
+    else {
+      const res: RegisterResponse = response.data;
+      window.localStorage.setItem("user", JSON.stringify(res));
+      location.reload()
+    }
   });
 }
 
-function login(email: string, password: string, error: Function, rememberMe: boolean) {
+function login(email: string, password: string, rememberMe: boolean, setTooltipActive: Function) {
   const loginObj = {
     username: email,
     password: password
@@ -99,13 +126,11 @@ function login(email: string, password: string, error: Function, rememberMe: boo
     if (response.status === 200) {
       const res: RegisterResponse = response.data;
       res.rememberMe = rememberMe;
-      console.log(res)
       window.localStorage.setItem("user", JSON.stringify(res));
       location.reload();
     }
-    else {
-      console.log(response.status)
-    }
+  }).catch(() => {
+    setTooltipActive();
   });
 }
 
