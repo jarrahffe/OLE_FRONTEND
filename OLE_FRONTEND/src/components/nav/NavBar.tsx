@@ -162,7 +162,7 @@ const NavBar = (props: Props) => {
           }
       </Box>
 
-      {
+      {/* {
         <div className='navbar-swap-menu'>
 
           <div className='navbar-swap-menu-time' style={{left: "0%"}}>
@@ -181,7 +181,7 @@ const NavBar = (props: Props) => {
           </div>
 
         </div>
-      }
+      } */}
 
       {
         props.isLoggedIn ?

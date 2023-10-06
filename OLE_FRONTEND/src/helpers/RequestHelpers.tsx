@@ -41,7 +41,8 @@ async function blockRequest(blockTimes: BlockTimes, token: string) {
 
 async function bookRequest(
   activity: RequestActivity,
-  token: string, setBookProgress: Function = () => {},
+  token: string,
+  setBookProgress: Function = () => {},
   setClicked: Function = () => {},
   setTooltipActive: Function = () => {}
   ) {

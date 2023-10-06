@@ -18,8 +18,7 @@ const MultiSelectModal = () => {
         const reqActivity: RequestActivity = activity;
         reqActivity.name = eventName;
         delete reqActivity.id;
-        const status: Array<number> = [];
-        bookRequest(reqActivity, status, token);
+        bookRequest(reqActivity, token);
       }
     }
     else if (blockSelect && multiActivities) {
