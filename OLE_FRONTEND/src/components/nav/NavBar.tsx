@@ -1,5 +1,5 @@
 import { Box } from '@mui/system';
-import { Typography, Button, Slider, Switch, Alert, IconButton, Badge, Icon, Tooltip } from '@mui/material';
+import { Typography, Button, Slider, Switch, Alert, IconButton, Tooltip } from '@mui/material';
 import React from 'react';
 import moment from 'moment';
 import { DateMapContext, MultiSelectContext, SwapContext, UserInfoContext, WeekContext } from '../../contexts';
