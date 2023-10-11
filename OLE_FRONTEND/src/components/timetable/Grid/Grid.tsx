@@ -4,7 +4,6 @@ import GridCell from './GridCell';
 import { ClickContext, DateMapContext, DayCardContext, MultiSelectContext, SwapContext, TimeCardContext, WeekContext } from '../../../contexts';
 import MultiSelectModal from '../Modals/MultiSelectModal';
 import { animated, useTransition } from '@react-spring/web';
-import SwapMenuModal from '../Modals/SwapMenuModal';
 import moment from 'moment';
 
 const TimeGrid = () => {

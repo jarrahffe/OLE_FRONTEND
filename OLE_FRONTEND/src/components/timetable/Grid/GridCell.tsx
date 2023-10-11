@@ -12,7 +12,6 @@ import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import { deleteActivity } from '../../../helpers/RequestHelpers';
 import { CURRENT_WEEK } from '../../../config/CurrentWeek';
 import StudioRadialMenu from './StudioRadialMenu';
-import SwapMenuModal from '../Modals/SwapMenuModal';
 
 const BLOCK_NAME = "block";
 
