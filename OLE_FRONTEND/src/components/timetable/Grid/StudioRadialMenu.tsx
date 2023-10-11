@@ -18,29 +18,30 @@ const StudioRadialMenu = () => {
   console.log(styles);
 
   return (
-    <div className='studio-radial-menu-base'
-    onMouseEnter={() => setRadialWheel(true)}
-    onMouseLeave={() => setRadialWheel(false)}>
+    null
+    // <div className='studio-radial-menu-base'
+    // onMouseEnter={() => setRadialWheel(true)}
+    // onMouseLeave={() => setRadialWheel(false)}>
 
-      <IconButton onClick={() => null} >
-        <LyricsRoundedIcon htmlColor='lightgray'/>
-      </IconButton>
+    //   <IconButton onClick={() => null} >
+    //     <LyricsRoundedIcon htmlColor='lightgray'/>
+    //   </IconButton>
 
-      {
-        radialWheel ?
-        <div className='studio-radial-menu-wheel'>
-          {
-            testnames.map((name, i) => {
-              // const top = styles[i][0];
-              // const left = styles[i][1];
-              return <div style={{position: "absolute", transformOrigin: "150%", transform: `rotate(calc(360deg / ${testnames.length} * var(--i)))`}}><Typography>{name}</Typography></div>
-            })
-          }
-        </div>
-        :
-        null
-      }
-    </div>
+    //   {
+    //     radialWheel ?
+    //     <div className='studio-radial-menu-wheel'>
+    //       {
+    //         testnames.map((name, i) => {
+    //           // const top = styles[i][0];
+    //           // const left = styles[i][1];
+    //           return <div style={{position: "absolute", transformOrigin: "150%", transform: `rotate(calc(360deg / ${testnames.length} * var(--i)))`}}><Typography>{name}</Typography></div>
+    //         })
+    //       }
+    //     </div>
+    //     :
+    //     null
+    //   }
+    // </div>
   )
 }
 
