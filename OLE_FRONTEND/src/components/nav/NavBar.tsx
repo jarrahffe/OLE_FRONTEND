@@ -8,7 +8,7 @@ import { Activity } from '../../config/activity';
 import ProfileDropdown from './ProfileDropdown';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import usyd_logo from '../../assets/usyd_logo.png'
+import con_logo from '../../assets/con_logo.png';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import { createSwapRequest } from '../../helpers/SwapHelpers';
 import { LoadingButton } from '@mui/lab';
@@ -170,7 +170,7 @@ const NavBar = (props: Props) => {
         {/* <Typography variant={HEADER_FONT_SIZE} component="h5">
           {TEACHER_NAME}'s 🎻 Studio
         </Typography> */ }
-        <img src={usyd_logo} style={{width: "80%"}}/>
+        <img src={con_logo} style={{width: "90%"}}/>
         {/* <img src={con_logo} style={{width: "100%"}}/> */}
       </Box>
 
