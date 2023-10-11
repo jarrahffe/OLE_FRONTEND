@@ -13,10 +13,7 @@ type Props = {
   dateTo: string
   timeFrom: number
   timeTo: number
-  state: number
   incoming: boolean
-  clicked: string
-  setClicked: React.Dispatch<React.SetStateAction<string>>
 }
 
 const SwapHubModalItem = (props: Props) => {

@@ -10,6 +10,12 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import usyd_logo from '../../assets/usyd_logo.png'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import { createSwapRequest } from '../../helpers/SwapHelpers';
+import { LoadingButton } from '@mui/lab';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import ErrorIcon from '@mui/icons-material/Error';
+import { animated, useTransition } from '@react-spring/web';
+import SwapHubDropdown from './SwapHubDropdown';
 
 type Props = {
   setLoginModalActive: React.Dispatch<React.SetStateAction<boolean>>
@@ -39,9 +45,31 @@ const NavBar = (props: Props) => {
     multiSelectModal, setMultiSelectModal
   } = React.useContext(MultiSelectContext);
 
-  const { isSuperUser } = React.useContext(UserInfoContext);
 
-  const { swapHubModal, setSwapHubModal, swapMenuModal, setSwapMenuModal } = React.useContext(SwapContext);
+
+
+  const { isSuperUser, token } = React.useContext(UserInfoContext);
+
+  const { swapHubModal, setSwapHubModal, swapMenuModal, setSwapMenuModal, swappedFrom, swappedTo, setSwappedFrom, setSwappedTo } = React.useContext(SwapContext);
+
+  const [bookProgress, setBookProgress] = React.useState(false);
+  const [errorTooltipActive, setErrorTooltipActive] = React.useState(false);
+  const [bookFeedbackIcon, setBookFeedbackIcon] = React.useState("");
+
+  const swapHubTransition = useTransition(swapHubModal, {
+    from: {
+      height: "0%",
+      opacity: "0%"
+    },
+    enter: {
+      height: "1025%",
+      opacity: "100%"
+    },
+    leave: {
+      height: "0%",
+      opacity: "0%"
+    },
+  });
 
   function handleSliderChange(val: number) {
     if (val > 14 || val < 1) return
@@ -60,6 +88,13 @@ const NavBar = (props: Props) => {
   }
 
   function handleUndo() {
+    if (swapMenuModal) {
+      setSwapMenuModal(false);
+      setSwappedFrom(undefined);
+      setSwappedTo(undefined);
+      return;
+    }
+
     if (multiActivities) {
       for (const setActivity of (multiActivities as Map<Activity, Function>).values()) {
         setActivity(undefined);
@@ -67,11 +102,51 @@ const NavBar = (props: Props) => {
     }
     if (multiDelete) {
       for (const setOpacity of (multiDelete as Map<Activity, Function>).values()) {
-        setOpacity("100%")
+        setOpacity("")
       }
     }
     setMultiDelete(undefined);
     setMultiActivities(undefined);
+  }
+
+  function formatSwappedString(swapped: Activity) {
+    return moment(`${swapped.date}-${swapped.start_time}`, "YYYY-MM-DD-H").format("ddd ha")
+  }
+
+  function handleSwapRequest() {
+    setBookProgress(true);
+    createSwapRequest((swappedFrom as Activity).id, (swappedTo as Activity).id,
+    token, setBookProgress, setErrorTooltipActive, setBookFeedbackIcon, setSwapMenuModal,
+    setSwappedFrom, setSwappedTo);
+  }
+
+  function getButtonUi() {
+    if (bookFeedbackIcon === "success") {
+      return (
+        <CheckCircleOutlineIcon
+        sx={{position: "absolute", left: "50%", top: "110%", transform: "translate(-50%, 0)"}}
+        color='success'/>
+      )
+    }
+    else if (bookFeedbackIcon === "error") {
+      return (
+        <ErrorIcon
+        sx={{position: "absolute", left: "50%", top: "110%", transform: "translate(-50%, 0)"}}
+        color='error'/>
+      )
+    }
+    return (
+      <LoadingButton
+      loading={bookProgress}
+      sx={{position: "absolute", left: "30%", right: "30%", top: "110%", color: swappedFrom && swappedTo ? "white" : "" }}
+      variant={!swappedFrom || !swappedTo ? "outlined" : "contained"}
+      size='small'
+      color="info"
+      onClick={() => handleSwapRequest()}
+      >
+        Send request
+      </LoadingButton>
+    )
   }
 
   return (
@@ -108,21 +183,28 @@ const NavBar = (props: Props) => {
           checked={blockSelect}
           onChange={() => handleBlockCheck()}
           name="multiselect"
-          disabled={multiActivities !== undefined}/>
+          disabled={multiActivities !== undefined || multiDelete !== undefined}/>
         </Box>
 
         <Box sx={{ display: "flex", flexDirection: "column", justifyContent:"center", alignItems: "center", position: "relative", }}>
           <Button
-          color={eventSelect ? "info" : "error"}
+          color='success'
           onClick={() => multiActivities || multiDelete ? setMultiSelectModal(true) : null}
-          variant={ multiActivities || multiDelete ? 'contained' : 'outlined'} size='small'>
+          variant={ multiActivities || multiDelete ? 'contained' : 'outlined'} size='small'
+          sx={{color: multiActivities || multiDelete ? "white" : ""}}
+          >
             Save
           </Button>
         </Box>
 
         <Box sx={{ display: "flex", flexDirection: "column",  alignItems: "center"}}>
           <Typography sx={{fontSize: "0.8rem"}}>Event</Typography>
-          <Switch disabled={multiActivities !== undefined} color='info' checked={eventSelect} onChange={() => handleEventCheck()} name="multiselect" />
+          <Switch
+          disabled={multiActivities !== undefined || multiDelete !== undefined}
+          color='info'
+          checked={eventSelect}
+          onChange={() => handleEventCheck()}
+          name="multiselect" />
         </Box>
       </Box>
       : null }
@@ -135,7 +217,7 @@ const NavBar = (props: Props) => {
         </Typography>
 
           {
-            multiActivities === undefined && multiDelete === undefined ?
+            multiActivities === undefined && multiDelete === undefined && !swapMenuModal ?
             <>
               <Slider
               sx={{position: "absolute", top: "50%"}}
@@ -156,17 +238,23 @@ const NavBar = (props: Props) => {
             <Alert
             severity='warning'
             action={
-              <Button sx={{position: "absolute", right: "0%"}} onClick={() => handleUndo()} size='small' color='inherit'>Undo all</Button>
+              <Button sx={{position: "absolute", right: "0%"}} onClick={() => handleUndo()} size='small' color='inherit'>Cancel</Button>
             }
             >Unsaved changes!</Alert>
           }
       </Box>
 
-      {/* {
+      {
+        swapMenuModal ?
         <div className='navbar-swap-menu'>
 
-          <div className='navbar-swap-menu-time' style={{left: "0%"}}>
-            <Typography sx={{fontWeight: 1000, color: "gold"}}>Fri 1pm</Typography>
+          <div className='navbar-swap-menu-time-glow-left'>
+            <div className='navbar-swap-menu-time'
+            style={{
+              backgroundColor: swappedFrom ? "#1976d2" : "white",
+            }}>
+              <Typography sx={{fontWeight: 1000, color: swappedFrom ? "gold" : "#1976d2"}}>{swappedFrom ? formatSwappedString(swappedFrom) : "SELECT"}</Typography>
+            </div>
           </div>
 
           <div className='navbar-arrow-glow'>
@@ -176,24 +264,60 @@ const NavBar = (props: Props) => {
             </div>
           </div>
 
-          <div className='navbar-swap-menu-time' style={{right: "0%"}}>
-            <Typography sx={{fontWeight: 1000}}>Thurs 10am</Typography>
+          <div className='navbar-swap-menu-time-glow-right' style={{right: "0%"}}>
+            <div className='navbar-swap-menu-time' style={{backgroundColor: "#1976d2"}}>
+              <Typography sx={{fontWeight: 1000}}>{swappedTo ? formatSwappedString(swappedTo as Activity) : "SELECT"}</Typography>
+            </div>
           </div>
 
+          <Tooltip
+          PopperProps={{
+            disablePortal: true,
+          }}
+          open={errorTooltipActive}
+          placement='top'
+          disableFocusListener
+          disableHoverListener
+          disableTouchListener
+          title={"This time is not available to swap with"}
+          >
+            { getButtonUi() }
+          </Tooltip>
         </div>
-      } */}
+        :
+        null
+      }
 
       {
         props.isLoggedIn ?
         <Box sx={{position: "absolute", right: "8%"}}>
-            <Tooltip title="Swaps">
-              <IconButton onClick={() => setSwapHubModal(!swapHubModal)} size='large'>
-                <SwapHorizIcon fontSize='large' htmlColor='gray'/>
-              </IconButton>
-            </Tooltip>
+          <Tooltip title="Swaps">
+            <IconButton
+            onClick={e => {
+              e.stopPropagation();
+              setSwapHubModal(!swapHubModal)
+            }
+            }
+            size='large'>
+              <SwapHorizIcon fontSize='large' htmlColor='gray'/>
+            </IconButton>
+          </Tooltip>
         </Box>
         :
         null
+      }
+
+      { swapHubTransition((style, modal) =>
+        modal ?
+          <animated.div
+          style={style}
+          className='swaphub-dropdown-outer'
+          onClick={e => e.stopPropagation()}
+          >
+            <SwapHubDropdown/>
+          </animated.div>
+        :
+        null)
       }
 
       <Box sx={{
@@ -210,7 +334,7 @@ const NavBar = (props: Props) => {
             <Button
             variant="contained"
             size="medium"
-            color='success'
+            color='error'
             onClick={() => props.setLoginModalActive(true)}
             >
               Login

@@ -15,17 +15,17 @@ const Theme = createTheme({
     secondary: {
       main: "#1976d2"
     },
-    // block gray
-    // error: {
-    //   main: "#37474f"
-    // },
+    //red
+    error: {
+      main: "#b71c1c"
+    },
     // event darkblue
     info: {
       main: "#303f9f"
     },
-    // RED
+    // green
     success: {
-      main: "#b71c1c"
+      main: "#00897b"
     },
 
   }

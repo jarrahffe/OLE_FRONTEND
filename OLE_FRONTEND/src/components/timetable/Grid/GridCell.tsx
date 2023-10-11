@@ -12,6 +12,7 @@ import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import { deleteActivity } from '../../../helpers/RequestHelpers';
 import { CURRENT_WEEK } from '../../../config/CurrentWeek';
 import StudioRadialMenu from './StudioRadialMenu';
+import SwapMenuModal from '../Modals/SwapMenuModal';
 
 const BLOCK_NAME = "block";
 
@@ -21,7 +22,6 @@ type Props = {
   day: string
   time: number
   dragging: React.MutableRefObject<boolean>
-  setSwapped: React.Dispatch<React.SetStateAction<Activity|undefined>>
   irlMinute: number
 }
 
@@ -35,14 +35,14 @@ const GridCell = (props: Props) => {
   const { blockSelect, eventSelect, multiActivities, setMultiActivities, multiDelete, setMultiDelete } = React.useContext(MultiSelectContext);
   const { dateMap } = React.useContext(DateMapContext);
   const { firstName, lastName, token, account, isSuperUser } = React.useContext(UserInfoContext);
-  const { setSwapMenuModal } = React.useContext(SwapContext);
+  const { swapMenuModal, setSwapMenuModal, setSwappedFrom, setSwappedTo, swappedFrom, swappedTo } = React.useContext(SwapContext);
 
   const gridCellDate = dateMap.get(props.day.slice(0, 3)) as string;
 
   // State
   const [activity, setActivity] = React.useState(props.activity);
   const [name, setName] = React.useState(firstName);
-  const [opacity, setOpacity] = React.useState("100%");
+  const [opacity, setOpacity] = React.useState("");
   const [deleteAnchorEl, setDeleteAnchorEl] = React.useState<null | HTMLElement>(null);
   const [swapAnchorEl, setSwapAnchorEl] = React.useState<null | HTMLElement>(null);
   const [pastTimeTooltip, setPastTimeTooltip] = React.useState(false);
@@ -122,6 +122,8 @@ const GridCell = (props: Props) => {
 
   // Set currently clicked cell
   function handleClick() {
+    if (hasExpired) return;
+
     if (blockSelect || eventSelect) {
 
       if (activity && multiActivities && multiActivities.has(activity)) {
@@ -133,13 +135,13 @@ const GridCell = (props: Props) => {
       else if (activity && multiDelete && multiDelete.has(activity)) {
         multiDelete.delete(activity);
         setMultiDelete(multiDelete.size === 0 ? undefined : multiDelete);
-        setOpacity("100%")
+        setOpacity("")
       }
 
       else if (activity) {
         if ((blockSelect && activity.type !== "block") || (eventSelect && activity.type !== "special")) return;
         setMultiDelete(multiDelete ? multiDelete.set(activity, setOpacity) : new Map<Activity, Function>([[activity, setOpacity]]));
-        setOpacity("25%")
+        setOpacity("40")
       }
 
       else {
@@ -150,6 +152,10 @@ const GridCell = (props: Props) => {
         if (multiActivities) setMultiActivities(multiActivities.set(newActivity, setActivity))
         else setMultiActivities(new Map<Activity, Function>([[newActivity, setActivity]]));
       }
+    }
+
+    else if (swapMenuModal && activity && activity.type === "lesson") {
+      activity.account === account ? setSwappedFrom(activity) : setSwappedTo(activity);
     }
 
     else clicked === props.id ? setClicked("") : setClicked(props.id);
@@ -177,7 +183,7 @@ const GridCell = (props: Props) => {
     if (!beingDragged.current && (blockSelect || eventSelect)) {
       beingDragged.current = true
     }
-    handleClick()
+    handleClick();
   }
 
   function isAfterCurrentDate() {
@@ -185,8 +191,187 @@ const GridCell = (props: Props) => {
   }
 
   function createSwapRequest() {
-    props.setSwapped(props.activity);
+    setSwappedTo(activity);
     setSwapMenuModal(true);
+  }
+
+  function getCell(activity: Activity) {
+    if (multiActivities?.has(activity)) {
+      return (
+        <div className='multi-select-glow'>
+            <div className="grid-cell-multi-select" style={{backgroundColor: map.get(activity.type)}}/>
+        </div>
+      )
+    }
+
+    else if (activity === swappedFrom) {
+      return (
+        <div className='multi-select-glow-alternate-colour'>
+          <div className="grid-cell-multi-select" style={{backgroundColor: map.get(activity.type)}}>
+            <div className='grid-cell-name'
+            style={{
+              color: activity.account === account && activity.type !== "special" ? "gold" : "white",
+              fontWeight: activity.account === account && activity.type !== "special" ? 1000 : 400
+            }}>
+              { activity.type !== BLOCK_NAME ?  <p>{activity.name}</p> : null }
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    else if (activity === swappedTo) {
+      return (
+        <div className='multi-select-glow'>
+          <div className="grid-cell-multi-select" style={{backgroundColor: map.get(activity.type)}}>
+            <div className='grid-cell-name'
+            style={{
+              color: activity.account === account && activity.type !== "special" ? "gold" : "white",
+              fontWeight: activity.account === account && activity.type !== "special" ? 1000 : 400
+            }}>
+              { activity.type !== BLOCK_NAME ?  <p>{activity.name}</p> : null }
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <div className="grid-cell-activity" style={{backgroundColor: hasExpired ? map.get(activity.type) + "40" : map.get(activity.type) + opacity}} >
+        {
+          dayCard === props.day.toLowerCase().slice(0, 3) && timeCard === time && !blockSelect && !eventSelect && (props.activity?.account === account || isSuperUser) && token && !hasExpired ?
+            <Tooltip title="Delete">
+              <IconButton onClick={handleDeleteMenuClick} sx={{position: "absolute", right: "5%"}}><DeleteIcon htmlColor='lightgray'/></IconButton>
+            </Tooltip>
+          :
+          null
+        }
+        <Menu
+          anchorEl={deleteAnchorEl}
+          id="account-menu"
+          open={deleteOpen}
+          onClose={handleDeleteClose}
+          onClick={handleDeleteClose}
+          sx={{
+              elevation: 0,
+              sx: {
+                overflow: 'visible',
+                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                mt: 1.5,
+                '& .MuiAvatar-root': {
+                  width: 32,
+                  height: 32,
+                  ml: -0.5,
+                  mr: 1,
+                },
+                '&:before': {
+                  content: '""',
+                  display: 'block',
+                  position: 'absolute',
+                  top: 0,
+                  right: 14,
+                  width: 10,
+                  height: 10,
+                  bgcolor: 'background.paper',
+                  transform: 'translateY(-50%) rotate(45deg)',
+                  zIndex: 0,
+                },
+              },
+            }}
+            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          >
+
+            <MenuItem onClick={() => {
+              deleteActivity(props.id, token);
+              setActivity(undefined);
+            }}>
+              Delete Activity
+            </MenuItem>
+
+        </Menu>
+
+        {
+          dayCard === props.day.toLowerCase().slice(0, 3) && timeCard === time && !blockSelect && !eventSelect && props.activity?.account !== account && token && isAfterCurrentDate() && !hasExpired && props.activity?.type === "lesson" ?
+          <Tooltip title="Swap">
+            <IconButton onClick={handleSwapMenuClick} sx={{position: "absolute", left: "5%"}}><SwapHorizIcon htmlColor='lightgray'/></IconButton>
+          </Tooltip>
+          :
+          null
+        }
+
+        <Menu
+          anchorEl={swapAnchorEl}
+          id="account-menu"
+          open={swapOpen}
+          onClose={handleSwapClose}
+          onClick={handleSwapClose}
+          sx={{
+            elevation: 0,
+            sx: {
+              overflow: 'visible',
+              filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+              mt: 1.5,
+              '& .MuiAvatar-root': {
+                width: 32,
+                height: 32,
+                ml: -0.5,
+                mr: 1,
+              },
+              '&:before': {
+                content: '""',
+                display: 'block',
+                position: 'absolute',
+                top: 0,
+                right: 14,
+                width: 10,
+                height: 10,
+                bgcolor: 'background.paper',
+                transform: 'translateY(-50%) rotate(45deg)',
+                zIndex: 0,
+              },
+            },
+          }}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        >
+          <MenuItem onClick={() => createSwapRequest()}>
+            Create Swap Request
+          </MenuItem>
+        </Menu>
+
+        {
+          activity.name.toLowerCase() === "studio" && dayCard === props.day.toLowerCase().slice(0, 3) && timeCard === time && !blockSelect && !eventSelect ?
+          <StudioRadialMenu/>
+          :
+          null
+        }
+
+        {
+          swapMenuModal && activity.account === account && !hasExpired ?
+            <SwapHorizIcon fontSize='large' htmlColor='gold'/>
+          :
+          <div className='grid-cell-name'
+          style={{
+            textDecoration: opacity !== "" ? "line-through" : "none",
+            color: activity.account === account && activity.type !== "special" ? "gold" : "white",
+            fontWeight: activity.account === account && activity.type !== "special" ? 1000 : 400
+          }}>
+            { activity.type !== BLOCK_NAME ?  <p>{activity.name}</p> : null }
+          </div>
+        }
+
+        {
+          clicked !== props.id && isInCurrentHourBracket ?
+            <>
+              <div className="grid-cell-time-indicator" style={{top: `${props.irlMinute / 60 * 100}%`}}/>
+              <div className="grid-cell-time-indicator-ball" style={{top: `${props.irlMinute / 60 * 100 - 7.5}%`}}/>
+            </>
+            :
+            null
+        }
+      </div>
+    )
   }
 
   return activity ?
@@ -200,140 +385,7 @@ const GridCell = (props: Props) => {
       onMouseLeave={() => handleLeave()}
       >
         {
-          multiActivities?.has(activity) ?
-            <div className='multi-select-glow'>
-                <div className="grid-cell-multi-select" style={{backgroundColor: map.get(activity.type)}}/>
-            </div>
-          :
-            <div className="grid-cell-activity" style={{ backgroundColor: map.get(activity.type), opacity: hasExpired ? "25%" : opacity}} >
-              {
-                dayCard === props.day.toLowerCase().slice(0, 3) && timeCard === time && !blockSelect && !eventSelect && (props.activity?.account === account || isSuperUser) && token && !hasExpired ?
-                  <Tooltip title="Delete">
-                    <IconButton onClick={handleDeleteMenuClick} sx={{position: "absolute", right: "5%"}}><DeleteIcon htmlColor='lightgray'/></IconButton>
-                  </Tooltip>
-                :
-                null
-              }
-              <Menu
-                anchorEl={deleteAnchorEl}
-                id="account-menu"
-                open={deleteOpen}
-                onClose={handleDeleteClose}
-                onClick={handleDeleteClose}
-                sx={{
-                    elevation: 0,
-                    sx: {
-                      overflow: 'visible',
-                      filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                      mt: 1.5,
-                      '& .MuiAvatar-root': {
-                        width: 32,
-                        height: 32,
-                        ml: -0.5,
-                        mr: 1,
-                      },
-                      '&:before': {
-                        content: '""',
-                        display: 'block',
-                        position: 'absolute',
-                        top: 0,
-                        right: 14,
-                        width: 10,
-                        height: 10,
-                        bgcolor: 'background.paper',
-                        transform: 'translateY(-50%) rotate(45deg)',
-                        zIndex: 0,
-                      },
-                    },
-                  }}
-                  transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                  anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                >
-
-                  <MenuItem onClick={() => {
-                    deleteActivity(props.id, token);
-                    setActivity(undefined);
-                  }}>
-                    Delete Activity
-                  </MenuItem>
-
-              </Menu>
-
-              {
-                dayCard === props.day.toLowerCase().slice(0, 3) && timeCard === time && !blockSelect && !eventSelect && props.activity?.account !== account && token && isAfterCurrentDate() && !hasExpired && props.activity?.type === "lesson"?
-                  <Tooltip title="Swap">
-                    <IconButton onClick={handleSwapMenuClick} sx={{position: "absolute", left: "5%"}}><SwapHorizIcon htmlColor='lightgray'/></IconButton>
-                  </Tooltip>
-                :
-                null
-              }
-
-              <Menu
-                anchorEl={swapAnchorEl}
-                id="account-menu"
-                open={swapOpen}
-                onClose={handleSwapClose}
-                onClick={handleSwapClose}
-                sx={{
-                  elevation: 0,
-                  sx: {
-                    overflow: 'visible',
-                    filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                    mt: 1.5,
-                    '& .MuiAvatar-root': {
-                      width: 32,
-                      height: 32,
-                      ml: -0.5,
-                      mr: 1,
-                    },
-                    '&:before': {
-                      content: '""',
-                      display: 'block',
-                      position: 'absolute',
-                      top: 0,
-                      right: 14,
-                      width: 10,
-                      height: 10,
-                      bgcolor: 'background.paper',
-                      transform: 'translateY(-50%) rotate(45deg)',
-                      zIndex: 0,
-                    },
-                  },
-                }}
-                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-              >
-                <MenuItem onClick={() => createSwapRequest()}>
-                  Create Swap Request
-                </MenuItem>
-              </Menu>
-
-              {
-                activity.name.toLowerCase() === "studio" && dayCard === props.day.toLowerCase().slice(0, 3) && timeCard === time && !blockSelect && !eventSelect ?
-                <StudioRadialMenu/>
-                :
-                null
-              }
-
-              <div className='grid-cell-name'
-              style={{
-                textDecoration: opacity !== "100%" ? "line-through" : "none",
-                color: activity.account === account && activity.type !== "special" ? "gold" : "white",
-                fontWeight: activity.account === account && activity.type !== "special" ? 1000 : 400
-              }}>
-                { activity.type !== BLOCK_NAME ?  <p>{activity.name}</p> : null }
-              </div>
-
-              {
-                clicked !== props.id && isInCurrentHourBracket ?
-                  <>
-                    <div className="grid-cell-time-indicator" style={{top: `${props.irlMinute / 60 * 100}%`}}/>
-                    <div className="grid-cell-time-indicator-ball" style={{top: `${props.irlMinute / 60 * 100 - 7.5}%`}}/>
-                  </>
-                  :
-                  null
-              }
-            </div>
+          getCell(activity)
         }
       </animated.div>
     )
@@ -350,23 +402,22 @@ const GridCell = (props: Props) => {
       disableTouchListener
       title={invalidBookMessage}
       >
-
         <div className="grid-cell-blank"
         onMouseEnter={() => handleEnter()}
-        // onMouseDown={() => {
-        //   if (hasExpired || (isGtOneWeekInAdvance && !isSuperUser) || (isOneWeekInAdvanceNotThursday && !isSuperUser)) {
-        //     setPastTimeTooltip(true);
-        //     setTimeout(() => {
-        //       setPastTimeTooltip(false);
-        //     }, 1000);
-        //   }
-        //   else if (clicked !== props.id) handleMouseDown();
-        // }}
-        onMouseDown={() => {if (clicked !== props.id) handleMouseDown()}}
+        onMouseDown={() => {
+          if (hasExpired || (isGtOneWeekInAdvance && !isSuperUser) || (isOneWeekInAdvanceNotThursday && !isSuperUser)) {
+            setPastTimeTooltip(true);
+            setTimeout(() => {
+              setPastTimeTooltip(false);
+            }, 1000);
+          }
+          else if (clicked !== props.id) handleMouseDown();
+        }}
         onMouseLeave={() => handleLeave()}
         onMouseUp={() => beingDragged.current = false}
         >
-          <div className="grid-cell-blank" />
+          <div className="grid-cell-blank"
+          />
           {
             transition((style, clicked) =>
               clicked === props.id ? <animated.div className="activity-selection" style={style}> <ActivitySelection name={name} setName={setName} day={props.day} time={props.time} setActivity={setActivity} /> </animated.div> : null
@@ -374,18 +425,18 @@ const GridCell = (props: Props) => {
           }
           {
             clicked === props.id ?
-              <ActivitySelectionPlaceholder name={name} />
-              :
-              null
+            <ActivitySelectionPlaceholder name={name} />
+            :
+            null
           }
           {
             clicked !== props.id && isInCurrentHourBracket ?
-              <>
-                <div className="grid-cell-time-indicator" style={{top: `${props.irlMinute / 60 * 100}%`}}/>
-                <div className="grid-cell-time-indicator-ball" style={{top: `${props.irlMinute / 60 * 100 - 7.5}%`}}/>
-              </>
-              :
-              null
+            <>
+              <div className="grid-cell-time-indicator" style={{top: `${props.irlMinute / 60 * 100}%`}}/>
+              <div className="grid-cell-time-indicator-ball" style={{top: `${props.irlMinute / 60 * 100 - 7.5}%`}}/>
+            </>
+            :
+            null
           }
         </div>
       </Tooltip>

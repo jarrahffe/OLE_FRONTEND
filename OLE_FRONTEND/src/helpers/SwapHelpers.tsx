@@ -3,8 +3,13 @@ import { SwapRequest } from "../config/SwapRequest";
 import { sleep } from "./Sleep";
 
 
-function createSwapRequest(id1: string, id2: string, token: string, setBookProgress: Function, setBookTooltip: Function) {
-let swapData: SwapRequest[] = JSON.parse(window.sessionStorage.getItem("swaps") as string);
+function createSwapRequest(
+  id1: string, id2: string, token: string,
+  setBookProgress: Function, setErrorTooltipActive: Function,
+  setBookFeedbackIcon: Function,
+  setSwapMenuModal: Function, setSwappedFrom: Function, setSwappedTo: Function) {
+
+  let swapData: SwapRequest[] = JSON.parse(window.sessionStorage.getItem("swaps") as string);
 
   axios.post(`${import.meta.env.VITE_BE_API_CREATE_SWAP_REQUEST}`,
   {
@@ -16,14 +21,32 @@ let swapData: SwapRequest[] = JSON.parse(window.sessionStorage.getItem("swaps") 
       "Authorization": `Token ${token}`
     }
   }).then(async response => {
+
     const newRequest: SwapRequest = response.data;
     swapData.push(newRequest);
     window.sessionStorage.setItem("swaps", JSON.stringify(swapData));
+
     await sleep(750);
     setBookProgress(false);
-    setBookTooltip(true);
+
+    setBookFeedbackIcon("success");
     setTimeout(() => {
-      setBookTooltip(false);
+      setBookFeedbackIcon("");
+      setSwapMenuModal(false);
+      setSwappedFrom(undefined);
+      setSwappedTo(undefined);
+    }, 2000);
+
+  }).catch(async () => {
+    await sleep(750);
+    setBookProgress(false);
+
+    setErrorTooltipActive(true);
+    setBookFeedbackIcon("error");
+    setTimeout(() => {
+      setErrorTooltipActive(false);
+      setBookFeedbackIcon("");
+      setSwappedTo(undefined);
     }, 2000);
   })
 }

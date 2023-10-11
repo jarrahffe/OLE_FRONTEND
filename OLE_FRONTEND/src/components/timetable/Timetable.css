@@ -125,6 +125,9 @@
 .grid-cell-multi-select {
   height: 88%;
   width: 97%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 @property --gradient-angle{
@@ -134,9 +137,9 @@
 }
 
 :root {
-  --clr-1: #0091ff;
-  --clr-2: #b00000;
-  --clr-3: #ffc400;
+  --clr-1: #1967d2;
+  --clr-2: #00bfff;
+  --clr-3: #00c227;
 }
 
 @keyframes rotation {
@@ -145,7 +148,7 @@
 }
 
 
-.multi-select-glow {
+.multi-select-glow, .multi-select-glow-alternate-colour {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -153,16 +156,29 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: rotation 10s linear infinite;
+}
+
+.multi-select-glow {
   background: conic-gradient(
     from var(--gradient-angle),
     var(--clr-1),
     var(--clr-2),
-    var(--clr-3),
     var(--clr-2),
-    var(--clr-1)
+    var(--clr-2),
+    var(--clr-2)
   );
-  animation: rotation 5s linear infinite;
-  filter: blur(0.05rem)
+}
+
+.multi-select-glow-alternate-colour {
+  background: conic-gradient(
+    from var(--gradient-angle),
+    var(--clr-1),
+    var(--clr-3),
+    var(--clr-3),
+    var(--clr-3),
+    var(--clr-3)
+  );
 }
 
 @media screen and (min-width: 601px) {

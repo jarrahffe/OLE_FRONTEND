@@ -6,14 +6,12 @@ import MultiSelectModal from '../Modals/MultiSelectModal';
 import { animated, useTransition } from '@react-spring/web';
 import SwapMenuModal from '../Modals/SwapMenuModal';
 import moment from 'moment';
-import SwapHubModal from '../Modals/SwapHubModal';
 
 const TimeGrid = () => {
 
   const interval = 15;
 
   const [clicked, setClicked] = React.useState("");
-  const [swapped, setSwapped] = React.useState<Activity>();
   const [irlMinute, setIrlMinute] = React.useState(moment().minute());
 
   const { selectedWeek } = React.useContext(WeekContext);
@@ -55,20 +53,6 @@ const TimeGrid = () => {
     },
   });
 
-  const swapHubTransition = useTransition(swapHubModal, {
-    from: {
-      height: "0%",
-      opacity: "0%"
-    },
-    enter: {
-      height: "100%",
-      opacity: "100%"
-    },
-    leave: {
-      height: "0%",
-      opacity: "0%"
-    },
-  });
 
 
   // Generates an array of grid cells. Then formatted as a matrix with css
@@ -88,7 +72,7 @@ const TimeGrid = () => {
         const date = dateMap.get(map.get(j).slice(0,3));
         const activity = data.find(activity => activity.start_time === i + 8 && activity.date === date);
         const id = activity ? activity.id : `${date}:${i + 8}`
-        cellArray.push(<GridCell activity={activity} id={id} key={`${id}:${selectedWeek}`} day={map.get(j)} time={i + 8} dragging={dragging} setSwapped={setSwapped} irlMinute={irlMinute}/>)
+        cellArray.push(<GridCell activity={activity} id={id} key={`${id}:${selectedWeek}`} day={map.get(j)} time={i + 8} dragging={dragging} irlMinute={irlMinute}/>)
       }
     }
     return cellArray;
@@ -130,18 +114,6 @@ const TimeGrid = () => {
           null)
         }
 
-        { swapHubTransition((style, modal) =>
-          modal ?
-            <animated.div
-            style={style}
-            className='multiselect-modal-outer'
-            onClick={() => setSwapHubModal(false)}
-            >
-              <SwapHubModal/>
-            </animated.div>
-          :
-          null)
-        }
 
         { cellArray }
       </div>

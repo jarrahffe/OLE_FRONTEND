@@ -73,10 +73,7 @@ const SwapHubModal = () => {
                   dateTo={(swapRequest.activity_2 as Activity).date}
                   timeFrom={(swapRequest.activity_1 as Activity).start_time}
                   timeTo={(swapRequest.activity_2 as Activity).start_time}
-                  state={swapRequest.state}
                   incoming={false}
-                  clicked={clicked}
-                  setClicked={setClicked}
                   />
                 )
                 :

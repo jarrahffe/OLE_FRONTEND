@@ -45,10 +45,11 @@ function App() {
 
   // Modal for swap menu
   const [swapMenuModal, setSwapMenuModal] = React.useState(false);
+  const [swappedFrom, setSwappedFrom] = React.useState<Activity>();
+  const [swappedTo, setSwappedTo] = React.useState<Activity>();
 
   // Modal for incoming and outgoing swap menu
   const [swapHubModal, setSwapHubModal] = React.useState(false);
-
   const [swapNotifications, setSwapNotifications] = React.useState();
 
   // Modal for logging in
@@ -74,6 +75,7 @@ function App() {
       setLoaded(true);
       console.log(error);
     });
+
     if (window.localStorage.getItem("user")) {
       const userInfo = JSON.parse(window.localStorage.getItem("user") as string)
       setFirstName((userInfo.first_name as string).charAt(0).toUpperCase() + (userInfo.first_name as string).slice(1));
@@ -111,18 +113,27 @@ function App() {
   return (
     <DateMapContext.Provider value={{ dateMap, setDateMap }}>
       <WeekContext.Provider value={{selectedWeek, setSelectedWeek}}>
-        <MultiSelectContext.Provider value={{blockSelect, setBlockSelect, eventSelect, setEventSelect,
-          multiActivities, setMultiActivities, multiDelete, setMultiDelete, multiSelectModal, setMultiSelectModal}}>
-          <SwapContext.Provider value={{swapMenuModal, setSwapMenuModal, swapHubModal, setSwapHubModal}}>
+        <MultiSelectContext.Provider
+        value={{blockSelect, setBlockSelect, eventSelect, setEventSelect,multiActivities,
+        setMultiActivities, multiDelete, setMultiDelete, multiSelectModal, setMultiSelectModal
+        }}
+        >
+          <SwapContext.Provider
+          value={{swapMenuModal, setSwapMenuModal, swapHubModal,
+            setSwapHubModal, swappedFrom, setSwappedFrom, swappedTo, setSwappedTo
+          }}
+          >
             <UserInfoContext.Provider value={{firstName, lastName, email, token, account, isSuperUser}}>
               <ThemeProvider theme={Theme}>
-                <div className="App">
+                <div className="App"
+                onClick={() => setSwapHubModal(false)}>
 
                   { loginModalTransition((style, loginModalActive) =>
                     loginModalActive ?
                       <animated.div
                       style={style}
                       className='login-card-outer'
+                      onClick={() => setLoginModalActive(false)}
                       >
                         <LoginCard
                         loginModalActive={loginModalActive}

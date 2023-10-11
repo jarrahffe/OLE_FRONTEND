@@ -1,10 +1,7 @@
-.navbar-login-card-background {
-}
-
 .navbar-login-box {
-    background-color: red;
-    width: 300px;
-    height: 100px;
+  background-color: red;
+  width: 300px;
+  height: 100px;
 }
 
 .navbar-swap-menu {
@@ -12,11 +9,24 @@
   display: flex;
   align-items: center;
   width: 23%;
+  bottom: 20%;
   height: 100%;
   right: 14%;
 }
 
 .navbar-swap-menu-time {
+  width: 95%;
+  border-radius: 0.1rem;
+  height: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  position: absolute;
+  flex-shrink: 0;
+}
+
+.navbar-swap-menu-time-glow-left, .navbar-swap-menu-time-glow-right {
   width: 35%;
   border-radius: 0.25rem;
   height: 80%;
@@ -25,8 +35,30 @@
   align-items: center;
   color: white;
   position: absolute;
-  background-color: #1976d2;
-  z-index: 5;
+  animation: rotation 5s linear infinite;
+}
+
+.navbar-swap-menu-time-glow-left {
+  background: conic-gradient(
+    from var(--gradient-angle),
+    var(--clr-1),
+    var(--clr-3),
+    var(--clr-3),
+    var(--clr-3),
+    var(--clr-3)
+  );
+}
+
+
+.navbar-swap-menu-time-glow-right {
+  background: conic-gradient(
+    from var(--gradient-angle),
+    var(--clr-1),
+    var(--clr-2),
+    var(--clr-2),
+    var(--clr-2),
+    var(--clr-2)
+  );
 }
 
 .navbar-swap-menu-arrow {
@@ -63,10 +95,6 @@
   inherits: false;
 }
 
-:root {
-  --clr-1: #1976d2;
-  --clr-3: #ffc400;
-}
 
 @keyframes rotation {
   0%   { --gradient-angle: 0deg; }
@@ -83,15 +111,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: conic-gradient(
-    from var(--gradient-angle),
-    var(--clr-1),
-    var(--clr-3),
-    var(--clr-1),
-    var(--clr-3),
-    var(--clr-1)
-  );
-  animation: rotation 2s linear infinite;
+  background-color: #1976d2;
+  animation: rotation 5s linear infinite;
 }
 
 .navbar-arrowhead-glow {
@@ -99,13 +120,65 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: conic-gradient(
-    from var(--gradient-angle),
-    var(--clr-3),
-    var(--clr-1),
-    var(--clr-3),
-    var(--clr-1),
-    var(--clr-3)
-  );
-  animation: rotation 2s linear infinite;
+  background-color: #1976d2;
+  animation: rotation 5s linear infinite;
+}
+
+.swaphub-dropdown-outer {
+  width: 20%;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  z-index: 5;
+  position: absolute;
+  top: 150%;
+  right: 0%;
+  background-color:#eceff1;
+  outline: grey solid 0.5px;
+}
+
+.swaphub-dropdown-items {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 40%;
+  overflow-y: scroll;
+}
+
+.swaphub-dropdown-item-sent,
+.swaphub-dropdown-item-received {
+  width: 90%;
+  height: 30%;
+  flex-grow: 0;
+  flex-shrink: 0;
+  margin: 7%;
+  position: relative;
+  background-color:#dee2e6;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.swaphub-dropdown-item-arrow {
+  background-color: black;
+  width: 55%;
+  left: 15%;
+  height: 5%;
+  position: absolute;
+  top: 50%;
+}
+
+.swaphub-dropdown-item-accept-decline {
+  width: 10%;
+  height: 50%;
+  border-radius: 0.75rem;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  top: 25%;
+  left: 5%;
+  position: absolute;
 }

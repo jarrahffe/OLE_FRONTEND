@@ -204,14 +204,14 @@ const LoginCard = (props: Props) => {
 
   return (
     <>
-      <animated.div className='login-card-inner' style={{...loginCardSprings}}>
+      <animated.div className='login-card-inner' style={{...loginCardSprings}} onClick={e => e.stopPropagation()}>
 
         <div className='login-card-close-button'>
           <Button onClick={() => props.setLoginModalActive(false)}><CloseIcon htmlColor='gray'/></Button>
         </div>
 
         <div className='login-card-title'>
-          <Typography sx={{ fontSize: "2rem", color: "black", }}>
+          <Typography sx={{fontSize: "2rem", color: "black"}}>
             LOG IN
           </Typography>
         </div>
@@ -299,12 +299,12 @@ const LoginCard = (props: Props) => {
 
         <div className="login-card-create-account" onClick={() => handleSignUpClick()}>
           <Typography>
-            New here? Create an account
+            New here? Become a student
           </Typography>
         </div>
       </animated.div>
 
-      <animated.div className='register-card-inner' style={{position: "absolute", ...signUpCardSprings}}>
+      <animated.div className='register-card-inner' style={{position: "absolute", ...signUpCardSprings}} onClick={e => e.stopPropagation()}>
 
         <div className='login-card-close-button'>
           <Button onClick={() => props.setLoginModalActive(false)}><CloseIcon htmlColor='gray'/></Button>

@@ -64,6 +64,7 @@ async function bookRequest(
       setTooltipActive(true);
       setTimeout(() => {
         setTooltipActive(false);
+        location.reload();
       }, sleepTime);
     }
 
