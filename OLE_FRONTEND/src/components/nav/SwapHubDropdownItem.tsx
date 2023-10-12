@@ -107,24 +107,29 @@ const SwapHubDropdownItem = (props: Props) => {
     props.setIncoming(incomingSwaps.filter(o => o.id !== props.id));
   }
 
-  async function handleAcceptSwapRequest() {
+  function handleAcceptSwapRequest() {
     // search through all requests, all which have activity 1 as date to, call cancel
-    let i = 0;
-    const swapsToKeep: SwapRequest[] = [];
-    outgoingSwaps.forEach(swapRequest => {
-      const req = swapRequest.activity_1 as Activity;
-      i++;
-      if (req.date + req.start_time === props.dateTo + props.timeTo) {
-        cancelSwapRequest(swapRequest.id, token).then(() => {
-          if (i === props.outgoingSwaps.length) {
-            acceptSwapRequest(props.id, token);
-            props.setIncoming(incomingSwaps.filter(o => o.id !== props.id));
-          }
-        });
-      }
-      else swapsToKeep.push(swapRequest);
+    cancelInvalidOutgoingRequests().then(swapsToKeep => {
+      acceptSwapRequest(props.id, token);
+      props.setIncoming(incomingSwaps.filter(o => o.id !== props.id));
+      props.setOutgoing(swapsToKeep);
     });
-    props.setOutgoing(swapsToKeep);
+  }
+
+  function cancelInvalidOutgoingRequests() {
+    return new Promise<SwapRequest[]>(resolve => {
+      const swapsToKeep: SwapRequest[] = [];
+
+      outgoingSwaps.forEach(swapRequest => {
+        const req = swapRequest.activity_1 as Activity;
+        if (req.date + req.start_time === props.dateTo + props.timeTo) {
+          cancelSwapRequest(swapRequest.id, token);
+        }
+        else swapsToKeep.push(swapRequest);
+      });
+
+      resolve(swapsToKeep);
+    })
   }
 
   return props.received ? (

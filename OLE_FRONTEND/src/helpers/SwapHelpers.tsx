@@ -47,7 +47,8 @@ function createSwapRequest(
       setErrorTooltipActive(false);
       setBookFeedbackIcon("");
       setSwappedTo(undefined);
-    }, 2000);
+      location.reload();
+    }, 3000);
   })
 }
 
