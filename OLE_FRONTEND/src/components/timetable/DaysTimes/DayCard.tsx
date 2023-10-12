@@ -63,7 +63,7 @@ const DayCard = (props: Props) => {
       {
         isCurrentDay ?
           <div className="day-card-day-date"
-          style={{backgroundColor: "#b71c1c", color: "white", opacity: moment().hours() + 1 >= 20 ? "25%" : "100%"}}>
+          style={{backgroundColor: "#b71c1c", color: "white"}}>
             {
               window.innerWidth < 601 ?
                 <h3>{props.day} {day}/{month}</h3>
