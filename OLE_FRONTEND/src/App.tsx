@@ -172,7 +172,7 @@ function App() {
                     />
                   }
 
-                  { getTimetable() }
+                  {getTimetable()}
 
                   {
                     window.innerWidth < 601 ?
