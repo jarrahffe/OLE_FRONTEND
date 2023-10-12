@@ -2,10 +2,15 @@ import React from 'react'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import HelpIcon from '@mui/icons-material/Help';
-import { IconButton, Typography } from '@mui/material';
+import { Button, IconButton, Tooltip, Typography } from '@mui/material';
 import moment from 'moment';
 import { AirplanemodeActiveRounded } from '@mui/icons-material';
 import { animated, useSpring, useTransition } from '@react-spring/web';
+import { acceptSwapRequest, cancelSwapRequest } from '../../helpers/SwapHelpers';
+import { UserInfoContext } from '../../contexts';
+import { Activity } from '../../config/activity';
+import { SwapRequest } from '../../config/SwapRequest';
+import { sleep } from '../../helpers/Sleep';
 
 type Props = {
   id: string
@@ -15,6 +20,10 @@ type Props = {
   timeFrom: number
   timeTo: number
   received: boolean
+  outgoingSwaps: SwapRequest[]
+  incomingSwaps: SwapRequest[]
+  setOutgoing: React.Dispatch<React.SetStateAction<SwapRequest[]>>
+  setIncoming: React.Dispatch<React.SetStateAction<SwapRequest[]>>
 }
 
 const SwapHubDropdownItem = (props: Props) => {
@@ -23,7 +32,7 @@ const SwapHubDropdownItem = (props: Props) => {
 
   const [arrowSprings, arrowApi] = useSpring(() => ({
     from: {
-      width: "55%",
+      width: "65%",
       left: "15%"
     }
   }));
@@ -34,19 +43,23 @@ const SwapHubDropdownItem = (props: Props) => {
     }
   }))
 
+  const { token } = React.useContext(UserInfoContext);
+
+  const outgoingSwaps = props.outgoingSwaps;
+  const incomingSwaps = props.incomingSwaps;
+
   function handleMouseEnter() {
     setHovered(true);
-    arrowApi.start({
-      from: {
-        width: "55%",
-        left: "15%"
-      },
-      to: {
-        width: "35%",
-        left: "35%"
-      }
-    });
-
+      arrowApi.start({
+        from: {
+          width: "65%",
+          left: "15%"
+        },
+        to: {
+          width: "45%",
+          left: "35%"
+        }
+      });
     acceptDeclineApi.start({
       from: {
         width: "10%",
@@ -62,10 +75,10 @@ const SwapHubDropdownItem = (props: Props) => {
     arrowApi.start({
       from: {
         width: "45%",
-        left: "25%"
+        left: "35%"
       },
       to: {
-        width: "55%",
+        width: "65%",
         left: "15%"
       }
     });
@@ -80,53 +93,101 @@ const SwapHubDropdownItem = (props: Props) => {
     });
   }
 
+  function getLessonFrom() {
+    return moment(`${props.dateFrom}-${props.timeFrom}`, "YYYY-MM-DD-H").format("ddd ha")
+  }
+
+  function getLessonTo() {
+    return moment(`${props.dateTo}-${props.timeTo}`, "YYYY-MM-DD-H").format("ddd ha");
+  }
+
+  function handleCancelSwapRequest() {
+    cancelSwapRequest(props.id, token);
+    props.setOutgoing(outgoingSwaps.filter(o => o.id !== props.id));
+    props.setIncoming(incomingSwaps.filter(o => o.id !== props.id));
+  }
+
+  async function handleAcceptSwapRequest() {
+    // search through all requests, all which have activity 1 as date to, call cancel
+    let i = 0;
+    const swapIdsToRemove: string[] = [];
+
+    outgoingSwaps.forEach(swapRequest => {
+      const req = swapRequest.activity_1 as Activity;
+      i++;
+      if (req.date + req.start_time === props.dateTo + props.timeTo) {
+        swapIdsToRemove.push(swapRequest.id);
+        cancelSwapRequest(swapRequest.id, token).then(() => {
+          if (i === props.outgoingSwaps.length) {
+            acceptSwapRequest(props.id, token);
+            props.setIncoming(incomingSwaps.filter(o => o.id !== props.id));
+          }
+        });
+      }
+    });
+  }
+
   return props.received ? (
-    <div className="swaphub-dropdown-item-received"
-    onMouseEnter={() => handleMouseEnter()}
-    onMouseLeave={() => handleMouseLeave()}
-    style={{backgroundColor: "#dee2e6"}}
-    >
-      <Typography sx={{position: "absolute", top: "-40%", left: "2.5%"}}>{moment(`${props.dateTo}-${props.timeTo}`, "YYYY-MM-DD-H").format("ddd ha")}</Typography>
+    <Tooltip title={`${props.name} wants to swap their ${getLessonFrom()} for your ${getLessonTo()}`}>
+      <div className="swaphub-dropdown-item-received"
+      onMouseEnter={() => handleMouseEnter()}
+      onMouseLeave={() => handleMouseLeave()}
+      style={{backgroundColor: "#dee2e6"}}
+      >
+        <Typography sx={{position: "absolute", top: "-40%", left: "2.5%"}}>{getLessonTo()}</Typography>
 
-      <animated.div style={{...acceptDeclineSprings, backgroundColor: hovered ? "#eceff1" : ""}} className="swaphub-dropdown-item-accept-decline">
-        {
-          hovered ?
-          <>
-            <IconButton>
-              <CheckCircleIcon color='success'/>
-            </IconButton>
+        <animated.div style={{...acceptDeclineSprings, backgroundColor: hovered ? "#eceff1" : ""}} className="swaphub-dropdown-item-accept-decline">
+          {
+            hovered ?
+            <>
+              <IconButton onClick={() => handleAcceptSwapRequest()}>
+                <CheckCircleIcon color='success'/>
+              </IconButton>
 
-            <IconButton>
-              <CancelIcon color='error'/>
-            </IconButton>
-          </>
-          :
-          <HelpIcon color='info'/>
-        }
-      </animated.div>
+              <IconButton onClick={() => handleCancelSwapRequest()}>
+                <CancelIcon color='error'/>
+              </IconButton>
+            </>
+            :
+            <HelpIcon color='info'/>
+          }
+        </animated.div>
 
-      <animated.div style={{...arrowSprings}} className='swaphub-dropdown-item-arrow'/>
+        <animated.div style={{...arrowSprings}} className='swaphub-dropdown-item-arrow'/>
 
-      <Typography sx={{position: "absolute", top: "-40%", right: "2.5%"}}>{moment(`${props.dateFrom}-${props.timeFrom}`, "YYYY-MM-DD-H").format("ddd ha")}</Typography>
-      <CheckCircleIcon sx={{position: "absolute", top: "25%", right: "20%"}} color='success'/>
-      <Typography sx={{position: "absolute", top: "25%", right: "2%"}}>{props.name}</Typography>
-    </div>
+        <Typography sx={{position: "absolute", top: "-40%", right: "2.5%"}}>{getLessonFrom()}</Typography>
+        <CheckCircleIcon sx={{position: "absolute", top: "25%", right: "12.5%"}} color='success'/>
+        <Typography sx={{position: "absolute", top: "25%", right: "5%", fontWeight: 1000}}>{props.name.substring(0,1).toUpperCase()}</Typography>
+      </div>
+    </Tooltip>
   )
   :
   (
-    <div className="swaphub-dropdown-item-sent"
-    onMouseEnter={() => handleMouseEnter()}
-    onMouseLeave={() => handleMouseLeave()}
-    >
-      <Typography sx={{position: "absolute", top: "-40%", left: "2.5%"}}>{moment(`${props.dateFrom}-${props.timeFrom}`, "YYYY-MM-DD-H").format("ddd ha")}</Typography>
-      <CheckCircleIcon sx={{position: "absolute", top: "25%", left: "5%"}} color='success'/>
+    <Tooltip title={`You requested to swap ${getLessonFrom()} for ${props.name}'s ${getLessonTo()}`}>
+      <div className="swaphub-dropdown-item-sent"
+      onMouseEnter={() => handleMouseEnter()}
+      onMouseLeave={() => handleMouseLeave()}
+      >
+        <Typography sx={{position: "absolute", top: "-40%", left: "2.5%"}}>{moment(`${props.dateFrom}-${props.timeFrom}`, "YYYY-MM-DD-H").format("ddd ha")}</Typography>
 
-      <animated.div style={{...arrowSprings}} className='swaphub-dropdown-item-arrow'/>
+          <animated.div style={{...acceptDeclineSprings, backgroundColor: hovered ? "#b71c1c" : ""}} className="swaphub-dropdown-item-accept-decline">
+            {
+              hovered ?
+              <Button variant='text' sx={{color: "white"}} onClick={() => handleCancelSwapRequest()}>
+                CANCEL
+              </Button>
+              :
+              <CheckCircleIcon color='success'/>
+            }
+          </animated.div>
 
-      <Typography sx={{position: "absolute", top: "-40%", right: "0%"}}>{moment(`${props.dateTo}-${props.timeTo}`, "YYYY-MM-DD-H").format("ddd ha")}</Typography>
-      <HelpIcon sx={{position: "absolute", top: "25%", right: "20%"}} color='info'/>
-      <Typography sx={{position: "absolute", top: "25%", right: "2%"}}>{props.name}</Typography>
-    </div>
+        <animated.div style={{...arrowSprings}} className='swaphub-dropdown-item-arrow'/>
+
+        <Typography sx={{position: "absolute", top: "-40%", right: "2.5%"}}>{moment(`${props.dateTo}-${props.timeTo}`, "YYYY-MM-DD-H").format("ddd ha")}</Typography>
+        <HelpIcon sx={{position: "absolute", top: "25%", right: "12.5%"}} color='info'/>
+        <Typography sx={{position: "absolute", top: "25%", right: "5%", fontWeight: 1000}}>{props.name.substring(0,1).toUpperCase()}</Typography>
+      </div>
+    </Tooltip>
   )
 }
 

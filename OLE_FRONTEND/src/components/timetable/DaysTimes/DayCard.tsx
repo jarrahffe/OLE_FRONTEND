@@ -66,7 +66,7 @@ const DayCard = (props: Props) => {
           style={{backgroundColor: "#b71c1c", color: "white", opacity: moment().hours() + 1 >= 20 ? "25%" : "100%"}}>
             {
               window.innerWidth < 601 ?
-                <p>{props.day} {day}/{month}</p>
+                <h3>{props.day} {day}/{month}</h3>
                 :
                 <h4>{props.day} {day}/{month}</h4>
             }
@@ -76,7 +76,7 @@ const DayCard = (props: Props) => {
           style={{...springs, opacity: moment().isAfter(moment(currentIsoDate?.join("-"), "YYYY-MM-DD")) ? "25%" : "100%"}}>
             {
               window.innerWidth < 601 ?
-                <p>{props.day} {day}/{month}</p>
+                <h3>{props.day} {day}/{month}</h3>
                 :
                 <h4>{props.day} {day}/{month}</h4>
             }

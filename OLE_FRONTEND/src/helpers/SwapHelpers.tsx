@@ -66,7 +66,7 @@ function acceptSwapRequest(id: string, token: string) {
   })
 }
 
-function cancelSwapRequest(id: string, token: string) {
+async function cancelSwapRequest(id: string, token: string) {
   let swapData: SwapRequest[] = JSON.parse(window.sessionStorage.getItem("swaps") as string);
   axios.delete(`${import.meta.env.VITE_BE_API_CANCEL_SWAP_REQUEST}`,
   {

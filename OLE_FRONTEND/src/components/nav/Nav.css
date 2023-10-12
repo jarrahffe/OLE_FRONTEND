@@ -182,3 +182,8 @@
   left: 5%;
   position: absolute;
 }
+
+.swaphub-dropdown-item-cancel-request {
+  background-color: #b71c1c;
+
+}

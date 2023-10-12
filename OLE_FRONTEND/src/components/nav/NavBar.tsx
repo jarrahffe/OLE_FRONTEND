@@ -163,17 +163,12 @@ const NavBar = (props: Props) => {
         width: HEADER_WIDTH,
         position: "relative",
         textAlign: "center",
-        // color: "whitesmoke",
         left: HEADER_DIST_FROM_SIDE,
-        // borderRadius: "0.25rem",
       }}>
-        {/* <Typography variant={HEADER_FONT_SIZE} component="h5">
-          {TEACHER_NAME}'s 🎻 Studio
-        </Typography> */ }
-        <img src={usyd_logo} style={{width: "80%", position: "relative", left: "0%"}}/>
+        <img src={usyd_logo} style={{width: isMobile ? "60%" : "80%", position: "relative", left: isMobile ? "-15%" : "0%"}}/>
       </Box>
 
-      { isSuperUser ?
+      { isSuperUser && !isMobile ?
       <Box sx={{display: "flex", position: "absolute", left: "19%", width: "20%", justifyContent: "space-evenly", alignItems:"center", }}>
         <Box sx={{ display: "flex", flexDirection: "column",  alignItems: "center"}}>
           <Typography sx={{fontSize: "0.8rem"}}>Busy</Typography>
@@ -206,7 +201,9 @@ const NavBar = (props: Props) => {
           name="multiselect" />
         </Box>
       </Box>
-      : null }
+      :
+      null
+      }
 
       <Box sx={{ height: "100%", width: "20%", position: "relative",
       left: "25%", display: "flex", flexDirection: "column"}}>
@@ -333,7 +330,7 @@ const NavBar = (props: Props) => {
             <Button
             variant="contained"
             size="medium"
-            color='error'
+            color='secondary'
             onClick={() => props.setLoginModalActive(true)}
             >
               Login

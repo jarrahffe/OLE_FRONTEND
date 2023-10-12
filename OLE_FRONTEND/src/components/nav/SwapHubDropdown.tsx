@@ -43,14 +43,17 @@ const SwapHubDropdown = () => {
     });
   });
 
+  const [outgoing, setOutgoing] = React.useState(outgoingSwaps);
+  const [incoming, setIncoming] = React.useState(incomingSwaps);
+
   return (
     <>
       <Typography sx={{position: "relative", top: "2%"}}>Received</Typography>
 
       <div className='swaphub-dropdown-items'>
         {
-          incomingSwaps.length !== 0 ?
-          incomingSwaps.map(swapRequest =>
+          incoming.length !== 0 ?
+          incoming.map(swapRequest =>
             <SwapHubDropdownItem
             id={swapRequest.id}
             name={(swapRequest.activity_1 as Activity).name}
@@ -59,6 +62,10 @@ const SwapHubDropdown = () => {
             timeFrom={(swapRequest.activity_1 as Activity).start_time}
             timeTo={(swapRequest.activity_2 as Activity).start_time}
             received={true}
+            outgoingSwaps={outgoing}
+            incomingSwaps={incoming}
+            setOutgoing={setOutgoing}
+            setIncoming={setIncoming}
             />
           )
           :
@@ -70,8 +77,8 @@ const SwapHubDropdown = () => {
 
       <div className='swaphub-dropdown-items'>
         {
-          outgoingSwaps.length !== 0 ?
-          outgoingSwaps.map(swapRequest =>
+          outgoing.length !== 0 ?
+          outgoing.map(swapRequest =>
             <SwapHubDropdownItem
             id={swapRequest.id}
             name={(swapRequest.activity_2 as Activity).name}
@@ -80,6 +87,10 @@ const SwapHubDropdown = () => {
             timeFrom={(swapRequest.activity_1 as Activity).start_time}
             timeTo={(swapRequest.activity_2 as Activity).start_time}
             received={false}
+            outgoingSwaps={outgoing}
+            incomingSwaps={incoming}
+            setOutgoing={setOutgoing}
+            setIncoming={setIncoming}
             />
           )
           :
