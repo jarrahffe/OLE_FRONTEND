@@ -20,7 +20,6 @@ import { CURRENT_WEEK } from './config/CurrentWeek';
 
 function App() {
 
-
   // App is loaded
   const [loaded, setLoaded] = React.useState(false);
 
@@ -109,6 +108,24 @@ function App() {
     }
   });
 
+  function getTimetable() {
+    if (window.innerWidth < 601) {
+      return (
+        <>
+          <Typography sx={{position: "relative", color: "black"}}>Cadenza for mobile is coming soon!</Typography>
+          <Typography sx={{position: "relative", color: "black"}}>Please try it out on your computer :)</Typography>
+        </>
+      )
+    }
+    else if (loaded) {
+      return (
+        <Timetable/>
+      )
+    }
+    else return (
+      <CircularProgress/>
+    )
+  }
 
   return (
     <DateMapContext.Provider value={{ dateMap, setDateMap }}>
@@ -145,13 +162,24 @@ function App() {
                     )
                   }
 
-                  <NavBar
-                  isLoggedIn={isLoggedIn}
-                  setLoginModalActive={setLoginModalActive}
-                  />
+                  {
+                    window.innerWidth < 601 ?
+                    null
+                    :
+                    <NavBar
+                    isLoggedIn={isLoggedIn}
+                    setLoginModalActive={setLoginModalActive}
+                    />
+                  }
 
-                  { loaded ? <Timetable /> : <CircularProgress/> }
-                  <Typography sx={{position: "absolute", bottom: "1%", right: "5%", color: "darkgrey"}}>Anything going wrong? Please email app.cadenza@gmail.com for support</Typography>
+                  { getTimetable() }
+
+                  {
+                    window.innerWidth < 601 ?
+                    null
+                    :
+                    <Typography sx={{position: "absolute", bottom: "1%", right: "5%", color: "darkgrey"}}>Anything going wrong? Please email app.cadenza@gmail.com for support</Typography>
+                  }
                 </div>
               </ThemeProvider>
             </UserInfoContext.Provider>
