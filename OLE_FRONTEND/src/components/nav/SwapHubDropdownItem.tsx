@@ -110,13 +110,11 @@ const SwapHubDropdownItem = (props: Props) => {
   async function handleAcceptSwapRequest() {
     // search through all requests, all which have activity 1 as date to, call cancel
     let i = 0;
-    const swapIdsToRemove: string[] = [];
-
+    const swapsToKeep: SwapRequest[] = [];
     outgoingSwaps.forEach(swapRequest => {
       const req = swapRequest.activity_1 as Activity;
       i++;
       if (req.date + req.start_time === props.dateTo + props.timeTo) {
-        swapIdsToRemove.push(swapRequest.id);
         cancelSwapRequest(swapRequest.id, token).then(() => {
           if (i === props.outgoingSwaps.length) {
             acceptSwapRequest(props.id, token);
@@ -124,7 +122,9 @@ const SwapHubDropdownItem = (props: Props) => {
           }
         });
       }
+      else swapsToKeep.push(swapRequest);
     });
+    props.setOutgoing(swapsToKeep);
   }
 
   return props.received ? (
