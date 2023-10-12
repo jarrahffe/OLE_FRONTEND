@@ -10,7 +10,7 @@ import { ThemeProvider } from '@emotion/react';
 import React from 'react';
 import axios from 'axios';
 import Theme from './Theme';
-import { CircularProgress } from '@mui/material';
+import { CircularProgress, Typography } from '@mui/material';
 import { DateMapContext, MultiSelectContext, WeekContext, UserInfoContext, SwapContext } from './contexts';
 import { mapDaysToDate } from './helpers/DateHelpers';
 import { Activity } from './config/activity';
@@ -151,6 +151,7 @@ function App() {
                   />
 
                   { loaded ? <Timetable /> : <CircularProgress/> }
+                  <Typography sx={{position: "absolute", bottom: "1%", right: "5%", color: "darkgrey"}}>Anything going wrong? Please email app.cadenza@gmail.com for support</Typography>
                 </div>
               </ThemeProvider>
             </UserInfoContext.Provider>
