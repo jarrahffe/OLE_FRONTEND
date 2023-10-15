@@ -105,9 +105,9 @@ setTooltipActive: Function) {
     password: password,
     password2: password
   }
+
   axios.post(`${import.meta.env.VITE_BE_API_REGISTER}`, registerObj).then(response => {
-    console.log(response.data)
-    if (response.data.email[0] === "account with this email already exists.") {
+    if (response.data.email && response.data.email[0] === "account with this email already exists.") {
       setTooltipActive();
     }
     else {

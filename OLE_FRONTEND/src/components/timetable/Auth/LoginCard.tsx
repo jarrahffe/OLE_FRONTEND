@@ -25,7 +25,7 @@ const LoginCard = (props: Props) => {
   const [confirmPassword, setConfirmPassword] = React.useState("")
   const [samePassword, setSamePassword] = React.useState(true);
   const [email, setEmail] = React.useState("");
-  const [rememberMe, setRememberMe] = React.useState(false);
+  const [rememberMe, setRememberMe] = React.useState(true);
 
   const [loginButtonSprings, loginButtonApi] = useSpring(() => ({
     from: {
@@ -261,11 +261,11 @@ const LoginCard = (props: Props) => {
           variant="outlined"
           onChange={e => setPassword(e.target.value)}
           onKeyDown={e => {
-            if (e.key === "Enter") handleLoginSubmit()
+            if (e.key === "Enter") handleLoginSubmit();
           }}
           />
 
-          <div className="login-card-forgot-password">
+          <div onClick={() => window.open("http://olebackend.com/accounts/reset_password", "_blank")} className="login-card-forgot-password">
             <Typography>Forgot password?</Typography>
           </div>
 
