@@ -171,6 +171,27 @@
   top: 50%;
 }
 
+.arrow-right, .arrow-left {
+  border: solid black;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+  position: absolute;
+  bottom: -125%;
+}
+
+.arrow-right {
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+  right: 0%;
+}
+
+.arrow-left {
+  transform: rotate(135deg);
+  -webkit-transform: rotate(135deg);
+  left: 0%;
+}
+
 .swaphub-dropdown-item-accept-decline {
   width: 10%;
   height: 50%;
@@ -185,5 +206,4 @@
 
 .swaphub-dropdown-item-cancel-request {
   background-color: #b71c1c;
-
 }

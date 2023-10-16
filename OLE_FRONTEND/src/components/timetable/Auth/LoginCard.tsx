@@ -277,7 +277,6 @@ const LoginCard = (props: Props) => {
 
         </div>
 
-
         <animated.div
         className="login-card-login-button"
         onClick={() => handleLoginSubmit()}

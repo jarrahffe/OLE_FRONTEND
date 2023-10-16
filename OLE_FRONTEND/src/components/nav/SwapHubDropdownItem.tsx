@@ -5,6 +5,7 @@ import HelpIcon from '@mui/icons-material/Help';
 import { Button, IconButton, Tooltip, Typography } from '@mui/material';
 import moment from 'moment';
 import { AirplanemodeActiveRounded } from '@mui/icons-material';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { animated, useSpring, useTransition } from '@react-spring/web';
 import { acceptSwapRequest, cancelSwapRequest } from '../../helpers/SwapHelpers';
 import { UserInfoContext } from '../../contexts';
@@ -32,7 +33,7 @@ const SwapHubDropdownItem = (props: Props) => {
 
   const [arrowSprings, arrowApi] = useSpring(() => ({
     from: {
-      width: "65%",
+      width: "62.5%",
       left: "15%"
     }
   }));
@@ -52,11 +53,11 @@ const SwapHubDropdownItem = (props: Props) => {
     setHovered(true);
       arrowApi.start({
         from: {
-          width: "65%",
+          width: "62.5%",
           left: "15%"
         },
         to: {
-          width: "45%",
+          width: "42.5%",
           left: "35%"
         }
       });
@@ -74,11 +75,11 @@ const SwapHubDropdownItem = (props: Props) => {
     setHovered(false);
     arrowApi.start({
       from: {
-        width: "45%",
+        width: "42.5%",
         left: "35%"
       },
       to: {
-        width: "65%",
+        width: "62.5%",
         left: "15%"
       }
     });
@@ -140,6 +141,7 @@ const SwapHubDropdownItem = (props: Props) => {
       style={{backgroundColor: "#dee2e6"}}
       >
         <Typography sx={{position: "absolute", top: "-40%", left: "2.5%"}}>{getLessonTo()}</Typography>
+        <Typography sx={{position: "absolute", top: "-40%", right: "2.5%"}}>{getLessonFrom()}</Typography>
 
         <animated.div style={{...acceptDeclineSprings, backgroundColor: hovered ? "#eceff1" : ""}} className="swaphub-dropdown-item-accept-decline">
           {
@@ -154,13 +156,14 @@ const SwapHubDropdownItem = (props: Props) => {
               </IconButton>
             </>
             :
-            <HelpIcon color='info'/>
+            <RadioButtonUncheckedIcon color='primary'/>
           }
         </animated.div>
 
-        <animated.div style={{...arrowSprings}} className='swaphub-dropdown-item-arrow'/>
+        <animated.div style={{...arrowSprings}} className='swaphub-dropdown-item-arrow'>
+          <div className='arrow-left'/>
+        </animated.div>
 
-        <Typography sx={{position: "absolute", top: "-40%", right: "2.5%"}}>{getLessonFrom()}</Typography>
         <CheckCircleIcon sx={{position: "absolute", top: "25%", right: "12.5%"}} color='success'/>
         <Typography sx={{position: "absolute", top: "25%", right: "5%", fontWeight: 1000}}>{props.name.substring(0,1).toUpperCase()}</Typography>
       </div>
@@ -174,6 +177,7 @@ const SwapHubDropdownItem = (props: Props) => {
       onMouseLeave={() => handleMouseLeave()}
       >
         <Typography sx={{position: "absolute", top: "-40%", left: "2.5%"}}>{moment(`${props.dateFrom}-${props.timeFrom}`, "YYYY-MM-DD-H").format("ddd ha")}</Typography>
+        <Typography sx={{position: "absolute", top: "-40%", right: "2.5%"}}>{moment(`${props.dateTo}-${props.timeTo}`, "YYYY-MM-DD-H").format("ddd ha")}</Typography>
 
           <animated.div style={{...acceptDeclineSprings, backgroundColor: hovered ? "#b71c1c" : ""}} className="swaphub-dropdown-item-accept-decline">
             {
@@ -186,10 +190,11 @@ const SwapHubDropdownItem = (props: Props) => {
             }
           </animated.div>
 
-        <animated.div style={{...arrowSprings}} className='swaphub-dropdown-item-arrow'/>
+        <animated.div style={{...arrowSprings}} className='swaphub-dropdown-item-arrow'>
+          <div className='arrow-right'/>
+        </animated.div>
 
-        <Typography sx={{position: "absolute", top: "-40%", right: "2.5%"}}>{moment(`${props.dateTo}-${props.timeTo}`, "YYYY-MM-DD-H").format("ddd ha")}</Typography>
-        <HelpIcon sx={{position: "absolute", top: "25%", right: "12.5%"}} color='info'/>
+        <RadioButtonUncheckedIcon sx={{position: "absolute", top: "25%", right: "12.5%"}} color='primary'/>
         <Typography sx={{position: "absolute", top: "25%", right: "5%", fontWeight: 1000}}>{props.name.substring(0,1).toUpperCase()}</Typography>
       </div>
     </Tooltip>
