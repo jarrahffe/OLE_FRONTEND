@@ -157,7 +157,9 @@ const GridCell = (props: Props) => {
       activity.account === account ? setSwappedFrom(activity) : setSwappedTo(activity);
     }
 
-    else clicked === props.id ? setClicked("") : setClicked(props.id);
+    else if (!activity) {
+      clicked === props.id ? setClicked("") : setClicked(props.id);
+    }
   }
 
   // Set hovered cell to reflect in day/time cards
