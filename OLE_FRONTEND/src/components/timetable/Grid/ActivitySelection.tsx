@@ -1,6 +1,6 @@
 import React from 'react'
 import { ClickContext, DateMapContext, UserInfoContext, WeekContext } from '../../../contexts';
-import { TextField, Button, CircularProgress, Tooltip } from '@mui/material';
+import { TextField, Button, CircularProgress, Tooltip, styled, TooltipProps, tooltipClasses } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import CloseIcon from '@mui/icons-material/Close'
 import { Activity } from '../../../config/activity';
@@ -103,9 +103,6 @@ const ActivitySelection = (props: Props) => {
 
       <div className='activity-selection-book-button'>
         <Tooltip
-          PopperProps={{
-            disablePortal: true,
-          }}
           open={tooltipActive}
           placement='top'
           disableFocusListener
