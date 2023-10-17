@@ -32,7 +32,6 @@ function createSwapRequest(
     setBookFeedbackIcon("success");
     setTimeout(() => {
       setBookFeedbackIcon("");
-      setSwapMenuModal(false);
       setSwappedFrom(undefined);
       setSwappedTo(undefined);
     }, 2000);

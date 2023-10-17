@@ -17,6 +17,7 @@ import { Activity } from './config/activity';
 import { animated, useTransition } from '@react-spring/web';
 import LoginCard from './components/timetable/Auth/LoginCard';
 import { CURRENT_WEEK } from './config/CurrentWeek';
+import { SwapRequest } from './config/SwapRequest';
 
 function App() {
 
@@ -63,32 +64,44 @@ function App() {
   const [account, setAccount] = React.useState(-1);
   const [isSuperUser, setIsSuperUser] = React.useState(false);
 
+
+
+  const [incomingSwapsLen, setIncomingSwapsLen] = React.useState(0);
+
   React.useEffect(() => {
     setLoaded(false);
     axios.get(`${import.meta.env.VITE_BE_API_TIMETABLE}`, {
     }).then(response => {
       sessionStorage.setItem("data", JSON.stringify(response.data.activities));
       sessionStorage.setItem("swaps", JSON.stringify(response.data.swaps));
-      setLoaded(true);
     }).catch(function(error) {
-      setLoaded(true);
       console.log(error);
-    });
-
-    if (window.localStorage.getItem("user")) {
-      const userInfo = JSON.parse(window.localStorage.getItem("user") as string)
-      setFirstName((userInfo.first_name as string).charAt(0).toUpperCase() + (userInfo.first_name as string).slice(1));
-      setLastName(userInfo.last_name);
-      setEmail(userInfo.email);
-      setToken(userInfo.token);
-      setAccount(userInfo.account);
-      setIsSuperUser(userInfo.is_superuser);
-      setIsLoggedIn(true);
-      if (userInfo.rememberMe === false) {
-        window.localStorage.removeItem("user");
+    }).finally(() => {
+      if (window.localStorage.getItem("user")) {
+        const userInfo = JSON.parse(window.localStorage.getItem("user") as string)
+        setFirstName((userInfo.first_name as string).charAt(0).toUpperCase() + (userInfo.first_name as string).slice(1));
+        setLastName(userInfo.last_name);
+        setEmail(userInfo.email);
+        setToken(userInfo.token);
+        setAccount(userInfo.account);
+        setIsSuperUser(userInfo.is_superuser);
+        setIsLoggedIn(true);
+        if (userInfo.rememberMe === false) {
+          window.localStorage.removeItem("user");
+        }
+        const activityIdsBelongingToUser = new Set<string>();
+        const activityArray: Activity[] = JSON.parse(window.sessionStorage.getItem("data") as string);
+        const swapsArray: SwapRequest[] = JSON.parse(window.sessionStorage.getItem("swaps") as string);
+        activityArray.forEach(a => {
+          if (a.account === userInfo.account) activityIdsBelongingToUser.add(a.id);
+        });
+        const incomingSwaps = swapsArray.filter(o => activityIdsBelongingToUser.has(o.activity_2 as string));
+        setIncomingSwapsLen(incomingSwaps.length);
       }
-    }
+      setLoaded(true);
+    });
   }, []);
+
 
   const loginModalTransition = useTransition(loginModalActive, {
     from: {
@@ -137,7 +150,7 @@ function App() {
         >
           <SwapContext.Provider
           value={{swapMenuModal, setSwapMenuModal, swapHubModal,
-            setSwapHubModal, swappedFrom, setSwappedFrom, swappedTo, setSwappedTo
+            setSwapHubModal, swappedFrom, setSwappedFrom, swappedTo, setSwappedTo, incomingSwapsLen, setIncomingSwapsLen
           }}
           >
             <UserInfoContext.Provider value={{firstName, lastName, email, token, account, isSuperUser}}>

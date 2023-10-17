@@ -59,6 +59,8 @@ type SwapContext = {
   setSwappedTo: React.Dispatch<React.SetStateAction<Activity|undefined>>
   swapHubModal: boolean
   setSwapHubModal: React.Dispatch<React.SetStateAction<boolean>>
+  incomingSwapsLen: number
+  setIncomingSwapsLen: React.Dispatch<React.SetStateAction<number>>
 }
 
 const ClickContext = React.createContext({} as ClickContext);

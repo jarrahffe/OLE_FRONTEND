@@ -18,8 +18,8 @@ const SwapHubDropdown = () => {
     if (a.account === account) activityIdsBelongingToUser.add(a.id);
   });
 
-  const outgoingSwaps = swapsArray.filter(o => activityIdsBelongingToUser.has(o.activity_1 as string));
   const incomingSwaps = swapsArray.filter(o => activityIdsBelongingToUser.has(o.activity_2 as string));
+  const outgoingSwaps = swapsArray.filter(o => activityIdsBelongingToUser.has(o.activity_1 as string));
 
   outgoingSwaps.forEach(swapRequest => {
     activityArray.forEach(activity => {

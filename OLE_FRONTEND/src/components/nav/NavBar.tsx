@@ -1,5 +1,5 @@
 import { Box } from '@mui/system';
-import { Typography, Button, Slider, Switch, Alert, IconButton, Tooltip } from '@mui/material';
+import { Typography, Button, Slider, Switch, Alert, IconButton, Tooltip, Badge } from '@mui/material';
 import React from 'react';
 import moment from 'moment';
 import { DateMapContext, MultiSelectContext, SwapContext, UserInfoContext, WeekContext } from '../../contexts';
@@ -16,6 +16,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorIcon from '@mui/icons-material/Error';
 import { animated, useTransition } from '@react-spring/web';
 import SwapHubDropdown from './SwapHubDropdown';
+import { SwapRequest } from '../../config/SwapRequest';
 
 type Props = {
   setLoginModalActive: React.Dispatch<React.SetStateAction<boolean>>
@@ -45,16 +46,15 @@ const NavBar = (props: Props) => {
     multiSelectModal, setMultiSelectModal
   } = React.useContext(MultiSelectContext);
 
-
-
-
-  const { isSuperUser, token } = React.useContext(UserInfoContext);
-
-  const { swapHubModal, setSwapHubModal, swapMenuModal, setSwapMenuModal, swappedFrom, swappedTo, setSwappedFrom, setSwappedTo } = React.useContext(SwapContext);
-
+  const { isSuperUser, token, account } = React.useContext(UserInfoContext);
+  const { swapHubModal, setSwapHubModal, swapMenuModal,
+    setSwapMenuModal, swappedFrom, swappedTo,
+    setSwappedFrom, setSwappedTo, incomingSwapsLen } = React.useContext(SwapContext);
   const [bookProgress, setBookProgress] = React.useState(false);
   const [errorTooltipActive, setErrorTooltipActive] = React.useState(false);
   const [bookFeedbackIcon, setBookFeedbackIcon] = React.useState("");
+
+
 
   const swapHubTransition = useTransition(swapHubModal, {
     from: {
@@ -295,7 +295,9 @@ const NavBar = (props: Props) => {
             }
             }
             size='large'>
-              <SwapHorizIcon fontSize='large' htmlColor='gray'/>
+              <Badge badgeContent={incomingSwapsLen} color='error'>
+                <SwapHorizIcon fontSize='large' htmlColor='gray'/>
+              </Badge>
             </IconButton>
           </Tooltip>
         </Box>

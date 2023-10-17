@@ -8,7 +8,7 @@ import { AirplanemodeActiveRounded } from '@mui/icons-material';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { animated, useSpring, useTransition } from '@react-spring/web';
 import { acceptSwapRequest, cancelSwapRequest } from '../../helpers/SwapHelpers';
-import { UserInfoContext } from '../../contexts';
+import { SwapContext, UserInfoContext } from '../../contexts';
 import { Activity } from '../../config/activity';
 import { SwapRequest } from '../../config/SwapRequest';
 import { sleep } from '../../helpers/Sleep';
@@ -45,6 +45,7 @@ const SwapHubDropdownItem = (props: Props) => {
   }))
 
   const { token } = React.useContext(UserInfoContext);
+  const { incomingSwapsLen, setIncomingSwapsLen } = React.useContext(SwapContext);
 
   const outgoingSwaps = props.outgoingSwaps;
   const incomingSwaps = props.incomingSwaps;
@@ -106,14 +107,17 @@ const SwapHubDropdownItem = (props: Props) => {
     cancelSwapRequest(props.id, token);
     props.setOutgoing(outgoingSwaps.filter(o => o.id !== props.id));
     props.setIncoming(incomingSwaps.filter(o => o.id !== props.id));
+    if (props.received) setIncomingSwapsLen(incomingSwapsLen - 1);
   }
 
   function handleAcceptSwapRequest() {
-    // search through all requests, all which have activity 1 as date to, call cancel
-    cancelInvalidOutgoingRequests().then(swapsToKeep => {
+    cancelInvalidOutgoingRequests().then(outgoingSwapsToKeep => {
       acceptSwapRequest(props.id, token);
-      props.setIncoming(incomingSwaps.filter(o => o.id !== props.id));
-      props.setOutgoing(swapsToKeep);
+      cancelInvalidIncomingRequests().then(incomingSwapsToKeep => {
+        props.setIncoming(incomingSwapsToKeep);
+        setIncomingSwapsLen(incomingSwapsToKeep.length);
+      });
+      props.setOutgoing(outgoingSwapsToKeep);
     });
   }
 
@@ -129,6 +133,20 @@ const SwapHubDropdownItem = (props: Props) => {
         else swapsToKeep.push(swapRequest);
       });
 
+      resolve(swapsToKeep);
+    })
+  }
+
+  function cancelInvalidIncomingRequests() {
+    return new Promise<SwapRequest[]>(resolve => {
+      const swapsToKeep: SwapRequest[] = [];
+
+      incomingSwaps.forEach(swapRequest => {
+        const req = swapRequest.activity_2 as Activity;
+        if (req.date + req.start_time !== props.dateTo + props.timeTo) {
+          swapsToKeep.push(swapRequest);
+        }
+      });
       resolve(swapsToKeep);
     })
   }
