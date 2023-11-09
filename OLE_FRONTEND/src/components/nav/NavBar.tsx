@@ -34,7 +34,7 @@ const NavBar = (props: Props) => {
   const HEADER_DIST_FROM_SIDE = isMobile ? "0%" : "2.5%";
 
   const CURRENT_WEEK = moment().diff(moment("2023-08-07", "YYYY-MM-DD"), "weeks") + 1;
-  const NUM_WEEKS_TOTAL = 14;
+  const NUM_WEEKS_TOTAL = 18;
 
   const { selectedWeek, setSelectedWeek } = React.useContext(WeekContext);
   const { dateMap, setDateMap } = React.useContext(DateMapContext);
@@ -72,7 +72,7 @@ const NavBar = (props: Props) => {
   });
 
   function handleSliderChange(val: number) {
-    if (val > 14 || val < 1) return
+    if (val > 18 || val < 1) return
     setSelectedWeek(val);
     setDateMap(mapDaysToDate(val - CURRENT_WEEK));
   }
