@@ -17,6 +17,7 @@ import ErrorIcon from '@mui/icons-material/Error';
 import { animated, useTransition } from '@react-spring/web';
 import SwapHubDropdown from './SwapHubDropdown';
 import { SwapRequest } from '../../config/SwapRequest';
+import { CURRENT_WEEK } from '../../config/CurrentWeek';
 
 type Props = {
   setLoginModalActive: React.Dispatch<React.SetStateAction<boolean>>
@@ -24,6 +25,8 @@ type Props = {
 }
 
 const NavBar = (props: Props) => {
+
+    console.log(CURRENT_WEEK)
 
   const isMobile = window.innerWidth < 601;
 
@@ -33,8 +36,7 @@ const NavBar = (props: Props) => {
   const HEADER_DIST_FROM_TOP = isMobile ? "1.5%" : "5%";
   const HEADER_DIST_FROM_SIDE = isMobile ? "0%" : "2.5%";
 
-  const CURRENT_WEEK = moment().diff(moment("2023-08-07", "YYYY-MM-DD"), "weeks") + 1;
-  const NUM_WEEKS_TOTAL = 18;
+  const NUM_WEEKS_TOTAL = 13;
 
   const { selectedWeek, setSelectedWeek } = React.useContext(WeekContext);
   const { dateMap, setDateMap } = React.useContext(DateMapContext);
@@ -72,7 +74,7 @@ const NavBar = (props: Props) => {
   });
 
   function handleSliderChange(val: number) {
-    if (val > 18 || val < 1) return
+    if (val > 13 || val < 0) return
     setSelectedWeek(val);
     setDateMap(mapDaysToDate(val - CURRENT_WEEK));
   }
@@ -221,7 +223,7 @@ const NavBar = (props: Props) => {
               defaultValue={CURRENT_WEEK}
               step={1}
               marks
-              min={1}
+              min={0}
               value={selectedWeek}
               max={NUM_WEEKS_TOTAL}
               onChange={(e, val) => handleSliderChange(val as number)}
