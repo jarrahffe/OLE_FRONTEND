@@ -26,8 +26,6 @@ type Props = {
 
 const NavBar = (props: Props) => {
 
-    console.log(CURRENT_WEEK)
-
   const isMobile = window.innerWidth < 601;
 
   const TEACHER_NAME = "Ole";

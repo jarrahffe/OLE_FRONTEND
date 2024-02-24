@@ -55,6 +55,7 @@ const GridCell = (props: Props) => {
   const hasExpired = moment().isAfter(moment(`${gridCellDate}-${props.time}`, "YYYY-MM-DD-kk"));
   const isGtOneWeekInAdvance = selectedWeek - CURRENT_WEEK > 1;
   const isOneWeekInAdvanceNotThursday = selectedWeek - CURRENT_WEEK === 1 && moment().weekday() < 4;
+  const isMobile = window.innerWidth < 601;
 
   let invalidBookMessage = "";
   if (hasExpired) invalidBookMessage = "Time is in the past!";
@@ -181,6 +182,7 @@ const GridCell = (props: Props) => {
   }
 
   function handleMouseDown() {
+    if (isMobile) return;
     if (!beingDragged.current && (blockSelect || eventSelect)) {
       beingDragged.current = true
     }

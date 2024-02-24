@@ -122,15 +122,15 @@ function App() {
   });
 
   function getTimetable() {
-    if (window.innerWidth < 601) {
-      return (
-        <>
-          <Typography sx={{position: "relative", color: "black"}}>Cadenza for mobile is coming soon!</Typography>
-          <Typography sx={{position: "relative", color: "black"}}>Please try it out on your computer :)</Typography>
-        </>
-      )
-    }
-    else if (loaded) {
+    // if (window.innerWidth < 601) {
+    //   return (
+    //     <>
+    //       <Typography sx={{position: "relative", color: "black"}}>Cadenza for mobile is coming soon!</Typography>
+    //       <Typography sx={{position: "relative", color: "black"}}>Please try it out on your computer :)</Typography>
+    //     </>
+    //   )
+    // }
+    if (loaded) {
       return (
         <Timetable/>
       )
