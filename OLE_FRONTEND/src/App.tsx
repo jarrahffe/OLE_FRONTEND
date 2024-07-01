@@ -16,7 +16,7 @@ import { mapDaysToDate } from './helpers/DateHelpers';
 import { Activity } from './config/activity';
 import { animated, useTransition } from '@react-spring/web';
 import LoginCard from './components/timetable/Auth/LoginCard';
-import { CURRENT_WEEK } from './config/CurrentWeek';
+import { CURRENT_WEEK, NUM_WEEKS_TOTAL, SESSION } from './config/Settings';
 import { SwapRequest } from './config/SwapRequest';
 
 function App() {
@@ -67,6 +67,8 @@ function App() {
 
 
   const [incomingSwapsLen, setIncomingSwapsLen] = React.useState(0);
+
+
 
   React.useEffect(() => {
     setLoaded(false);

@@ -17,7 +17,7 @@ import ErrorIcon from '@mui/icons-material/Error';
 import { animated, useTransition } from '@react-spring/web';
 import SwapHubDropdown from './SwapHubDropdown';
 import { SwapRequest } from '../../config/SwapRequest';
-import { CURRENT_WEEK } from '../../config/CurrentWeek';
+import { CURRENT_WEEK, NUM_WEEKS_TOTAL, TEACHER_NAME, SEMESTER, SESSION  } from '../../config/Settings';
 
 type Props = {
   setLoginModalActive: React.Dispatch<React.SetStateAction<boolean>>
@@ -28,16 +28,16 @@ const NavBar = (props: Props) => {
 
   const isMobile = window.innerWidth < 601;
 
-  const TEACHER_NAME = "Ole";
   const HEADER_FONT_SIZE = isMobile ? "h6" : "h5";
   const HEADER_WIDTH = isMobile ? "50%" : "15%";
   const HEADER_DIST_FROM_TOP = isMobile ? "1.5%" : "5%";
   const HEADER_DIST_FROM_SIDE = isMobile ? "0%" : "2.5%";
 
-  const NUM_WEEKS_TOTAL = 13;
 
   const { selectedWeek, setSelectedWeek } = React.useContext(WeekContext);
   const { dateMap, setDateMap } = React.useContext(DateMapContext);
+  
+
   const {
     blockSelect, setBlockSelect,
     eventSelect, setEventSelect,
@@ -71,8 +71,11 @@ const NavBar = (props: Props) => {
     },
   });
 
+
+
   function handleSliderChange(val: number) {
-    if (val > 13 || val < 0) return
+    if (val > NUM_WEEKS_TOTAL || val < 0) return
+      
     setSelectedWeek(val);
     setDateMap(mapDaysToDate(val - CURRENT_WEEK));
   }
@@ -209,27 +212,28 @@ const NavBar = (props: Props) => {
       left: "25%", display: "flex", flexDirection: "column"}}>
 
         <Typography sx={{display: "flex", justifyContent: "center", fontSize: "1rem"}}>
-          Week {selectedWeek}
+          {SESSION}
         </Typography>
 
           {
             multiActivities === undefined && multiDelete === undefined && !swapMenuModal ?
-            <>
-              <Slider
-              sx={{position: "absolute", top: "50%"}}
-              aria-label="Week"
-              defaultValue={CURRENT_WEEK}
-              step={1}
-              marks
-              min={0}
-              value={selectedWeek}
-              max={NUM_WEEKS_TOTAL}
-              onChange={(e, val) => handleSliderChange(val as number)}
-              />
-              <IconButton  sx={{position: "absolute", right: "0%", top: "100%"}} onClick={() => handleSliderChange(selectedWeek + 1)}><ArrowForwardIcon fontSize='small' color='primary'/></IconButton>
-              <IconButton sx={{position: "absolute", left: "0%", top: "100%"}} onClick={() => handleSliderChange(selectedWeek - 1)}><ArrowBackIcon fontSize='small' color='primary'/></IconButton>
-              <Button size='small' sx={{position: "absolute", left: "30%", right: "30%", top: "110%"}} onClick={() => handleSliderChange(CURRENT_WEEK)}>This Week</Button>
-            </>
+            (SESSION ===  'Semester Break' ) ? null : (
+              <>
+                <Slider
+                sx={{position: "absolute", top: "50%"}}
+                aria-label="Week"
+                defaultValue={CURRENT_WEEK}
+                step={1}
+                marks
+                min={0}
+                value={selectedWeek}
+                max={NUM_WEEKS_TOTAL}
+                onChange={(e, val) => handleSliderChange(val as number)}
+                />
+                <IconButton  sx={{position: "absolute", right: "0%", top: "100%"}} onClick={() => handleSliderChange(selectedWeek + 1)}><ArrowForwardIcon fontSize='small' color='primary'/></IconButton>
+                <IconButton sx={{position: "absolute", left: "0%", top: "100%"}} onClick={() => handleSliderChange(selectedWeek - 1)}><ArrowBackIcon fontSize='small' color='primary'/></IconButton>
+                <Button size='small' sx={{position: "absolute", left: "30%", right: "30%", top: "110%"}} onClick={() => handleSliderChange(CURRENT_WEEK)}>{(selectedWeek < 14) ? `Week ${selectedWeek}` : "Exam Period"}</Button>
+             </>)
             :
             <Alert
             severity='warning'

@@ -10,7 +10,7 @@ import { ClickContext, TimeCardContext, DayCardContext, WeekContext, MultiSelect
 import { animated, useSpring, useTransition } from '@react-spring/web';
 import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import { deleteActivity } from '../../../helpers/RequestHelpers';
-import { CURRENT_WEEK } from '../../../config/CurrentWeek';
+import { CURRENT_WEEK, NUM_WEEKS_TOTAL } from '../../../config/Settings';
 import StudioRadialMenu from './StudioRadialMenu';
 
 const BLOCK_NAME = "block";
@@ -57,8 +57,12 @@ const GridCell = (props: Props) => {
   const isOneWeekInAdvanceNotThursday = selectedWeek - CURRENT_WEEK === 1 && moment().weekday() < 4;
   const isMobile = window.innerWidth < 601;
 
+  const isSemesterBreak = (CURRENT_WEEK > NUM_WEEKS_TOTAL) || (CURRENT_WEEK < 0)
+
   let invalidBookMessage = "";
-  if (hasExpired) invalidBookMessage = "Time is in the past!";
+  
+  if (isSemesterBreak) invalidBookMessage = "Semester Break";
+  else if (hasExpired) invalidBookMessage = "Time is in the past!";
   else if (isGtOneWeekInAdvance) invalidBookMessage = `Time is ${selectedWeek - CURRENT_WEEK} weeks ahead!`;
   else if (isOneWeekInAdvanceNotThursday) invalidBookMessage = "Please wait until Thursday to book";
 
@@ -408,7 +412,7 @@ const GridCell = (props: Props) => {
         <div className="grid-cell-blank"
         onMouseEnter={() => handleEnter()}
         onMouseDown={() => {
-          if (hasExpired || (isGtOneWeekInAdvance && !isSuperUser) || (isOneWeekInAdvanceNotThursday && !isSuperUser)) {
+          if (hasExpired || (isGtOneWeekInAdvance && !isSuperUser) || (isOneWeekInAdvanceNotThursday && !isSuperUser) || isSemesterBreak) {
             setPastTimeTooltip(true);
             setTimeout(() => {
               setPastTimeTooltip(false);
