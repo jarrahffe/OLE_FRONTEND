@@ -33,13 +33,16 @@ type Props = {
 const SwapHubDropdownItem = (props: Props) => {
   const [hovered, setHovered] = React.useState(false)
 
+  const [arrowSprings, arrowApi] = useSpring(() => ({
+    from: {
+      width: "62.5%",
+      left: "15%",
+    },
+  }))
+
   const [acceptDeclineSprings, acceptDeclineApi] = useSpring(() => ({
     from: {
       width: "0%",
-    },
-
-    to: {
-      width: "26%",
     },
   }))
 
@@ -52,9 +55,19 @@ const SwapHubDropdownItem = (props: Props) => {
 
   function handleMouseEnter() {
     setHovered(true)
+    arrowApi.start({
+      from: {
+        width: "62.5%",
+        left: "15%",
+      },
+      to: {
+        width: "42.5%",
+        left: "35%",
+      },
+    })
     acceptDeclineApi.start({
       from: {
-        width: "0%",
+        width: "10%",
       },
       to: {
         width: "26%",
@@ -64,12 +77,23 @@ const SwapHubDropdownItem = (props: Props) => {
 
   function handleMouseLeave() {
     setHovered(false)
-    acceptDeclineApi.start({
+    arrowApi.start({
       from: {
-        width: "26%",
+        width: "42.5%",
+        left: "35%",
       },
       to: {
-        width: "0%",
+        width: "62.5%",
+        left: "15%",
+      },
+    })
+
+    acceptDeclineApi.start({
+      from: {
+        width: "30%",
+      },
+      to: {
+        width: "10%",
       },
     })
   }
@@ -144,62 +168,53 @@ const SwapHubDropdownItem = (props: Props) => {
         onMouseLeave={() => handleMouseLeave()}
         style={{ backgroundColor: "#dee2e6" }}
       >
-        {/* Top */}
-        <div className="relative flex h-[30%] w-full justify-center">
-          <Typography
-            sx={{ fontSize: "0.75rem" }}
-            className="text-right text-xs"
-          >
-            From {props.name}
-          </Typography>
+        {/* Top of Card */}
+        <div className="relative flex h-[35%] w-full flex-nowrap justify-around">
+          <Typography>{getLessonTo()}</Typography>
+          <Typography>{getLessonFrom()}</Typography>
         </div>
 
-        {/* Bottom */}
-        <div className="w-full flex-col space-y-0.5 p-2">
+        {/* Bottom of Card */}
+        <div className="relative h-[65%] w-full flex-col p-2">
           {/* [Bottom] top */}
           <div className="relative flex justify-start text-xs">
-            <div className="">{getLessonTo()}</div>
+            <animated.div
+              style={{
+                ...acceptDeclineSprings,
+                backgroundColor: hovered ? "#eceff1" : "",
+              }}
+              className="flex items-center justify-around rounded-lg"
+            >
+              {hovered ? (
+                <>
+                  <IconButton onClick={() => handleAcceptSwapRequest()}>
+                    <CheckCircleIcon
+                      color="success"
+                      className="absolute text-xs"
+                    />
+                  </IconButton>
+
+                  <IconButton onClick={() => handleCancelSwapRequest()}>
+                    <CancelIcon color="error" className="absolute text-xs" />
+                  </IconButton>
+                </>
+              ) : (
+                <div>YOU</div>
+              )}
+            </animated.div>
+
             <div className="absolute left-[30%] top-[50%] h-[10%] w-[40%] -translate-y-1/2 transform bg-gray-600" />
             <ChevronLeft className="absolute left-[25%] top-[50%] -translate-y-1/2 transform content-center text-gray-600" />
           </div>
+
           {/* [Bottom] bottom */}
           <div className="relative flex justify-between text-xs">
-            {hovered ? (
-              <animated.div
-                style={{
-                  ...acceptDeclineSprings,
-                  backgroundColor: hovered ? "#eceff1" : "",
-                }}
-                className="flex items-center justify-around rounded-lg"
-              >
-                <IconButton onClick={() => handleAcceptSwapRequest()}>
-                  <CheckCircleIcon
-                    color="success"
-                    className="absolute text-xs"
-                    sx={{ fontSize: "16px" }}
-                  />
-                </IconButton>
-
-                <IconButton onClick={() => handleCancelSwapRequest()}>
-                  <CancelIcon
-                    color="error"
-                    sx={{ fontSize: "16px" }}
-                    className="absolute text-xs"
-                  />
-                </IconButton>
-              </animated.div>
-            ) : (
-              <RadioButtonUncheckedIcon sx={{ fontSize: "16px" }} />
-            )}
-            <div>
+            <div></div>
+            <div className="w-[60%]">
               <div className="absolute right-[30%] top-[50%] h-[10%] w-[40%] -translate-y-1/2 transform bg-gray-600" />
-              {hovered ? (
-                <></>
-              ) : (
-                <NavigateNext className="absolute right-[25%] top-[50%] -translate-y-1/2 transform content-center text-gray-600" />
-              )}
+              <NavigateNext className="absolute right-[25%] top-[50%] -translate-y-1/2 transform content-center text-gray-600" />
             </div>
-            <div>{getLessonFrom()}</div>
+            <div>michelle</div>
           </div>
         </div>
       </div>
@@ -216,43 +231,45 @@ const SwapHubDropdownItem = (props: Props) => {
         style={{ backgroundColor: "#dee2e6" }}
       >
         {/* Top of Card */}
-        <div className="relative flex h-[30%] w-full justify-center">
-          <Typography
-            sx={{ fontSize: "0.75rem" }}
-            className="text-right text-xs"
-          >
-            To {props.name}
-          </Typography>
+        <div className="relative flex h-[35%] w-full flex-nowrap justify-around">
+          <Typography>{getLessonTo()}</Typography>
+          <Typography>{getLessonFrom()}</Typography>
         </div>
 
         {/* Bottom of Card */}
-        <div className="relative h-[70%] w-full flex-col space-y-0.5 p-2">
+        <div className="relative h-[65%] w-full flex-col p-2">
           {/* [Bottom] top */}
           <div className="relative flex justify-start text-xs">
-            <div className="">{getLessonFrom()}</div>
+            <animated.div
+              style={{ ...acceptDeclineSprings }}
+              className={`flex items-center justify-around rounded-lg ${hovered ? "bg-red-700" : "bg-transparent"}`}
+            >
+              {hovered ? (
+                <Button
+                  variant="text"
+                  sx={{ color: "white", fontSize: "0.75rem" }}
+                  onClick={() => handleCancelSwapRequest()}
+                  className="absolute size-2"
+                >
+                  Cancel
+                </Button>
+              ) : (
+                <div>YOU</div>
+              )}
+            </animated.div>
+
             <div className="absolute left-[30%] top-[50%] h-[10%] w-[40%] -translate-y-1/2 transform bg-gray-600" />
-            {!hovered && (
-              <ChevronLeft className="absolute left-[25%] top-[50%] -translate-y-1/2 transform content-center text-gray-600" />
-            )}
+            <ChevronLeft className="absolute left-[25%] top-[50%] -translate-y-1/2 transform content-center text-gray-600" />
           </div>
 
           {/* [Bottom] bottom */}
           <div className="relative flex justify-between text-xs">
-            {hovered ? (
-              <animated.div style={{ ...acceptDeclineSprings }}>
-                <button
-                  onClick={() => handleCancelSwapRequest()}
-                  className="absolute w-[25%] rounded-lg bg-red-700 text-white"
-                >
-                  Cancel
-                </button>
-              </animated.div>
-            ) : (
-              <div></div>
-            )}
-            <div className="absolute right-[30%] top-[50%] h-[10%] w-[40%] -translate-y-1/2 transform bg-gray-600" />
-            <NavigateNext className="absolute right-[25%] top-[50%] -translate-y-1/2 transform content-center text-gray-600" />
-            <div>{getLessonTo()}</div>
+            <div></div>
+            <div className="w-[60%]">
+              <div className="absolute right-[30%] top-[50%] h-[10%] w-[40%] -translate-y-1/2 transform bg-gray-600" />
+              <NavigateNext className="absolute right-[25%] top-[50%] -translate-y-1/2 transform content-center text-gray-600" />
+            </div>
+            <div>Jimmy</div>
           </div>
         </div>
       </div>

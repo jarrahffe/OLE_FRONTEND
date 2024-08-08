@@ -313,7 +313,7 @@ const NavBar = (props: Props) => {
         modal ?
           <animated.div
           style={style}
-          className='swaphub-dropdown-outer'
+          className="w-1/5 rounded-md flex flex-col justify-evenly items-center z-10 absolute top-[150%] right-0 bg-gray-100 outline outline-gray-500 outline-[0.5px]"
           onClick={e => e.stopPropagation()}
           >
             <SwapHubDropdown/>

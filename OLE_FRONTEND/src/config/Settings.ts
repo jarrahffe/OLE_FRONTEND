@@ -10,7 +10,6 @@ export let SESSION =  'Semester Break' || `Semester ${SEMESTER}` || 'Exam Period
 
 if (0 <= CURRENT_WEEK && CURRENT_WEEK < 13) {
     SESSION = `Semester ${SEMESTER}`;
-
 } else if (0 < CURRENT_WEEK && CURRENT_WEEK < 18) {
     SESSION = 'Exam Period'
 } else {

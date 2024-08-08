@@ -134,7 +134,7 @@ function App() {
     // }
     if (loaded) {
       return (
-        <Timetable/>
+          <Timetable/>
       )
     }
     else return (
