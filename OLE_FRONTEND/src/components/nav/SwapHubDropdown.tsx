@@ -1,10 +1,11 @@
-import { Typography } from '@mui/material'
-import React from 'react'
+import { Button, Typography } from "@mui/material"
+import React from "react"
 import SwapHubDropdownItem from "./SwapHubDropdownItem"
 import { SwapRequest } from "../../config/SwapRequest"
 import { Activity } from "../../config/activity"
 import { SwapContext, UserInfoContext } from "../../contexts"
 import "../../index.css"
+import SwapDialog from "./CreateSwapModal"
 
 const SwapHubDropdown = () => {
   const { setSwapHubModal } = React.useContext(SwapContext)
@@ -54,10 +55,12 @@ const SwapHubDropdown = () => {
   const [incoming, setIncoming] = React.useState(incomingSwaps)
 
   return (
-    <>
-      <Typography className="relative top-[2%]">Received</Typography>
+    <div className="relative flex h-full w-full flex-col justify-evenly">
+      <Typography className="rounded-lg border-2 border-slate-300 text-center">
+        Received
+      </Typography>
 
-      <div className="relative flex h-[40%] w-full flex-col items-center overflow-y-scroll">
+      <div className="relative flex max-h-[40%] w-full flex-col items-center overflow-y-scroll">
         {incoming.length !== 0 ? (
           incoming.map((swapRequest) => (
             <SwapHubDropdownItem
@@ -81,9 +84,10 @@ const SwapHubDropdown = () => {
         )}
       </div>
 
-      <Typography>Sent</Typography>
-
-      <div className="relative flex h-[40%] w-full flex-col items-center overflow-y-scroll">
+      <Typography className="rounded-lg border-2 border-slate-300 text-center">
+        Sent
+      </Typography>
+      <div className="relative flex max-h-[40%] w-full flex-col items-center overflow-y-scroll">
         {outgoing.length !== 0 ? (
           outgoing.map((swapRequest) => (
             <SwapHubDropdownItem
@@ -106,7 +110,16 @@ const SwapHubDropdown = () => {
           </Typography>
         )}
       </div>
-    </>
+
+      <SwapDialog />
+      {/* <Button
+        variant="contained"
+        color="secondary"
+        className="m-12 h-6 w-full p-4"
+      >
+        Create Swap
+      </Button> */}
+    </div>
   )
 }
 

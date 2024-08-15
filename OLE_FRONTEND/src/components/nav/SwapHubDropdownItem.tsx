@@ -139,10 +139,10 @@ const SwapHubDropdownItem = (props: Props) => {
     >
       {/* Received Card */}
       <div
-        className="relative m-[2%] h-[50%] w-[90%] flex-shrink-0 flex-grow-0 cursor-pointer rounded-md border-2 bg-gray-200 p-1"
+        className="relative m-[2%] h-20 w-[90%] flex-shrink-0 flex-grow-0 cursor-pointer rounded-md border-2 border-slate-200 p-1"
         onMouseEnter={() => handleMouseEnter()}
         onMouseLeave={() => handleMouseLeave()}
-        style={{ backgroundColor: "#dee2e6" }}
+        // style={{ backgroundColor: "#dee2e6" }}
       >
         {/* Top */}
         <div className="relative flex h-[30%] w-full justify-center">
@@ -159,8 +159,8 @@ const SwapHubDropdownItem = (props: Props) => {
           {/* [Bottom] top */}
           <div className="relative flex justify-start text-xs">
             <div className="">{getLessonTo()}</div>
-            <div className="absolute left-[30%] top-[50%] h-[10%] w-[40%] -translate-y-1/2 transform bg-gray-600" />
-            <ChevronLeft className="absolute left-[25%] top-[50%] -translate-y-1/2 transform content-center text-gray-600" />
+            <div className="absolute left-[30%] top-[50%] h-[10%] w-[40%] -translate-y-1/2 transform bg-gray-400" />
+            <ChevronLeft className="absolute left-[25%] top-[50%] -translate-y-1/2 transform content-center text-gray-400" />
           </div>
           {/* [Bottom] bottom */}
           <div className="relative flex justify-between text-xs">
@@ -192,11 +192,11 @@ const SwapHubDropdownItem = (props: Props) => {
               <RadioButtonUncheckedIcon sx={{ fontSize: "16px" }} />
             )}
             <div>
-              <div className="absolute right-[30%] top-[50%] h-[10%] w-[40%] -translate-y-1/2 transform bg-gray-600" />
+              <div className="absolute right-[30%] top-[50%] h-[10%] w-[40%] -translate-y-1/2 transform bg-gray-400" />
               {hovered ? (
                 <></>
               ) : (
-                <NavigateNext className="absolute right-[25%] top-[50%] -translate-y-1/2 transform content-center text-gray-600" />
+                <NavigateNext className="absolute right-[25%] top-[50%] -translate-y-1/2 transform content-center text-gray-400" />
               )}
             </div>
             <div>{getLessonFrom()}</div>
@@ -210,10 +210,9 @@ const SwapHubDropdownItem = (props: Props) => {
     >
       {/* Received Card */}
       <div
-        className="relative m-[2%] h-[50%] w-[90%] flex-shrink-0 flex-grow-0 cursor-pointer rounded-md border-2 bg-gray-200 p-1"
+        className="relative m-[2%] h-20 w-[90%] flex-shrink-0 flex-grow-0 cursor-pointer rounded-md border-2 border-slate-200 p-1"
         onMouseEnter={() => handleMouseEnter()}
         onMouseLeave={() => handleMouseLeave()}
-        style={{ backgroundColor: "#dee2e6" }}
       >
         {/* Top of Card */}
         <div className="relative flex h-[30%] w-full justify-center">
@@ -230,9 +229,9 @@ const SwapHubDropdownItem = (props: Props) => {
           {/* [Bottom] top */}
           <div className="relative flex justify-start text-xs">
             <div className="">{getLessonFrom()}</div>
-            <div className="absolute left-[30%] top-[50%] h-[10%] w-[40%] -translate-y-1/2 transform bg-gray-600" />
+            <div className="absolute left-[30%] top-[50%] h-[10%] w-[40%] -translate-y-1/2 transform bg-gray-400" />
             {!hovered && (
-              <ChevronLeft className="absolute left-[25%] top-[50%] -translate-y-1/2 transform content-center text-gray-600" />
+              <ChevronLeft className="absolute left-[25%] top-[50%] -translate-y-1/2 transform content-center text-gray-400" />
             )}
           </div>
 
@@ -250,8 +249,8 @@ const SwapHubDropdownItem = (props: Props) => {
             ) : (
               <div></div>
             )}
-            <div className="absolute right-[30%] top-[50%] h-[10%] w-[40%] -translate-y-1/2 transform bg-gray-600" />
-            <NavigateNext className="absolute right-[25%] top-[50%] -translate-y-1/2 transform content-center text-gray-600" />
+            <div className="absolute right-[30%] top-[50%] h-[10%] w-[40%] -translate-y-1/2 transform bg-gray-400" />
+            <NavigateNext className="absolute right-[25%] top-[50%] -translate-y-1/2 transform content-center text-gray-400" />
             <div>{getLessonTo()}</div>
           </div>
         </div>
