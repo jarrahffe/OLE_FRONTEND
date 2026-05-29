@@ -1,6 +1,6 @@
 import moment from "moment";
-export const START_SEMESTER = "2025-08-04";
-export const SEMESTER = 2;
+export const START_SEMESTER = "2026-02-23";
+export const SEMESTER = 1;
 
 export const CURRENT_WEEK = moment().diff(moment(START_SEMESTER, "YYYY-MM-DD"), "weeks");
 export const NUM_WEEKS_TOTAL = 16;
