@@ -8,7 +8,7 @@ export const TEACHER_NAME = "Ole";
 export let SESSION =  'Semester Break' || `Semester ${SEMESTER}` || 'Exam Period';
 
 
-if (0 <= CURRENT_WEEK && CURRENT_WEEK < 16) {
+if (0 <= CURRENT_WEEK && CURRENT_WEEK < 14) {
     SESSION = `Semester ${SEMESTER}`;
 } else if (0 < CURRENT_WEEK && CURRENT_WEEK < 16) {
     SESSION = 'Exam Period'
